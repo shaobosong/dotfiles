@@ -1,0 +1,4 @@
+--hidden
+
+--glob=!tags
+--glob=!.git/*
