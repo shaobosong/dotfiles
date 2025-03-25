@@ -2390,4 +2390,15 @@ dashboard registers -style list "rax rbx rcx rdx rsi rdi rbp rsp r8 r9 r10 r11 r
 # set debuginfod enabled on
 set print elements 0
 
-
+# c++
+set print pretty on
+set print object on
+set print static-members on
+set print vtbl on
+set print asm-demangle on
+set print demangle on
+set demangle-style gnu-v3
+# c++ pretty printers
+python import sys; sys.path.insert(0, '/usr/share/gcc/python')
+python from libstdcxx.v6.printers import register_libstdcxx_printers
+python register_libstdcxx_printers(gdb.current_objfile())
