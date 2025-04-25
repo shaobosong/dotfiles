@@ -2,6 +2,8 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+_dotfiles_root=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -30,11 +32,6 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
@@ -47,30 +44,21 @@ force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
     else
-	color_prompt=
+        color_prompt=
     fi
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n\$ '
+    PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] ($?)\n\$ '
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    PS1='\u@\h:\w ($?)\n\$ '
 fi
 unset color_prompt force_color_prompt
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -116,16 +104,23 @@ if ! shopt -oq posix; then
   fi
 fi
 
-alias ci='source ~/bashrc/cd-index.sh'
-alias wl='~/bashrc/win-ldd.sh'
-alias tscp='~/bashrc/tscp.sh'
+# aliases
+_bash_d="${_dotfiles_root}/.bash.d"
+alias ci="source ${_bash_d}/cd-index.sh"
+alias wl="${_bash_d}/win-ldd.sh"
+alias ts="${_bash_d}/tar-scp.sh"
 
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
 alias 2dec='printf %d\\n'
 
-alias lg='lazygit'
+alias lg='\lazygit'
+alias curl='\curl -x socks5h://$(\awk '\''$2 == "00000000" {print strtonum("0x" substr($3,7,2)) "." strtonum("0x" substr($3,5,2)) "." strtonum("0x" substr($3,3,2)) "." strtonum("0x" substr($3,1,2))}'\'' /proc/net/route):2208'
 
+# exports
+export PROMPT_COMMAND="history -a; history -n"
 export FZF_DEFAULT_OPTS="--bind 'alt-j:down,alt-k:up,alt-l:close,ctrl-alt-h:backward-kill-word'"
 export DELTA_FEATURES='+side-by-side'
-export RIPGREP_CONFIG_PATH=~/.config/ripgrep/config
+export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
+export RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
+export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
