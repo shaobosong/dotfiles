@@ -34,7 +34,7 @@ vim.opt.listchars = {
 
 -- Status line settings
 vim.opt.laststatus = 2
-vim.opt.statusline = '%<%f%h%m%r%=[%n] %l/%L'
+vim.opt.statusline = '%<%{expand("%:~:.")}%h%m%r%=[%n] %l/%L'
 
 -- Indentation settings
 vim.opt.expandtab = true
