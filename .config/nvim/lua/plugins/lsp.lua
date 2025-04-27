@@ -102,10 +102,19 @@ return {
                         },
                     },
                 },
+                {
+                    name = "c3_lsp",
+                    bin = "c3lsp",
+                    config = {
+                        cmd = {
+                            'c3lsp',
+                        },
+                        filetypes = { 'c3', 'c3i', "c3t" },
+                    },
+                },
             }
             for _, server in ipairs(servers) do
                 if vim.fn.exepath(server.bin) ~= "" then
-                    lspconfig[server.name].setup(server.config)
                     -- `nvim-lspconfig` includes configurations compatible
                     -- with `vim.lsp` under `lsp/` (neovim 0.11.0+)
                     vim.lsp.config(server.name, server.config)
@@ -116,6 +125,7 @@ return {
                 'lua_ls',
                 'clangd',
                 'rust_analyzer',
+                'c3_lsp',
             })
         end,
     },

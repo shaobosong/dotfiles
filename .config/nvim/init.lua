@@ -2,6 +2,8 @@
 require("config.option")
 -- vim variables
 require("config.variable")
+-- vim filetypes
+require("config.filetype")
 -- vim autocmds
 require("config.autocmd")
 -- vim mappings
