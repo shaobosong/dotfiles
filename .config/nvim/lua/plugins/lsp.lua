@@ -25,30 +25,23 @@ return {
         },
         config = function()
             local lspconfig = require("lspconfig")
-            local capabilities = vim.lsp.protocol.make_client_capabilities()
-            capabilities.textDocument.completion.completionItem.snippetSupport = true
+            -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+            -- capabilities.textDocument.completion.completionItem.snippetSupport = true
             local servers = {
                 {
                     name = "clangd",
                     bin = "clangd",
                     config = {
-                        capabilities = capabilities,
-                        root_dir = function(fname)
-                            return require("lspconfig.util").root_pattern(
-                                ".git",
-                                "Makefile",
-                                "configure.ac",
-                                "configure.in",
-                                "config.h.in",
-                                "meson.build",
-                                "meson_options.txt",
-                                "build.ninja",
-                                "compile_commands.json",
-                                "compile_flags.txt"
-                            )(fname) or vim.fs.dirname(
-                                vim.fs.find('.git', { path = fname, upward = true })[1]
-                            )
-                        end,
+                        capabilities = {
+                            textDocument = {
+                                completion = {
+                                    editsNearCursor = true,
+                                    completionItem = {
+                                        snippetSupport = true
+                                    },
+                                },
+                            },
+                        },
                         cmd = {
                             'clangd',
                             '--compile-commands-dir=build',
@@ -60,6 +53,7 @@ return {
                             -- "--function-arg-placeholders",
                             -- "--fallback-style=llvm",
                         },
+                        filetypes = { 'c', 'cpp', 'objc', 'objcpp', 'cuda', 'proto' },
                         init_options = {
                             usePlaceholders = true,
                             completeUnimported = true,
@@ -72,7 +66,10 @@ return {
                     name = "lua_ls",
                     bin = "lua-language-server",
                     config = {
-                        capabilities = capabilities,
+                        cmd = {
+                            "lua-language-server",
+                        },
+                        filetypes = { 'lua' },
                         settings = {
                             Lua = {
                                 runtime = {
@@ -96,6 +93,10 @@ return {
                     name = "rust_analyzer",
                     bin = "rust-analyzer",
                     config = {
+                        cmd = {
+                            'rust-analyzer',
+                        },
+                        filetypes = { 'rust' },
                         settings = {
                             ['rust-analyzer'] = {},
                         },
@@ -105,8 +106,17 @@ return {
             for _, server in ipairs(servers) do
                 if vim.fn.exepath(server.bin) ~= "" then
                     lspconfig[server.name].setup(server.config)
+                    -- `nvim-lspconfig` includes configurations compatible
+                    -- with `vim.lsp` under `lsp/` (neovim 0.11.0+)
+                    vim.lsp.config(server.name, server.config)
                 end
             end
+            -- Auto-activated when a filetype is opened (neovim 0.11.0+)
+            vim.lsp.enable({
+                'lua_ls',
+                'clangd',
+                'rust_analyzer',
+            })
         end,
     },
     {
