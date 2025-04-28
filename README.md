@@ -4,7 +4,7 @@
 
 ### Dependencies
 
-- GNU coreutils(`dirname`, `readlink`, `rm`, `mv`, `ln`)
+- GNU coreutils(`dirname`, `readlink`, `mkdir`, `rm`, `mv`, `ln`)
 
 ### Description
 
