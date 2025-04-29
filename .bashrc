@@ -124,6 +124,8 @@ export DELTA_FEATURES='+side-by-side'
 export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
 export RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
 export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
+export GOMODCACHE=$HOME/.cache/go/pkg/mod
+export GOPATH=$HOME/.go
 export GOPROXY=https://goproxy.cn
 
 # sources
