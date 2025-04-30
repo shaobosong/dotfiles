@@ -17,7 +17,7 @@ return {
             backends = {
                 ['_'] = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
                 c = { "lsp" },
-        },
+            },
 
             layout = {
                 -- These control the width of the aerial window.
@@ -247,159 +247,159 @@ return {
 
             -- Automatically open aerial when entering supported buffers.
             -- This can be a function (see :help aerial-open-automatic)
-                open_automatic = false,
+            open_automatic = false,
 
-                -- Run this command after jumping to a symbol (false will disable)
-                post_jump_cmd = "normal! zz",
+            -- Run this command after jumping to a symbol (false will disable)
+            post_jump_cmd = "normal! zz",
 
-                -- Invoked after each symbol is parsed, can be used to modify the parsed item,
-                -- or to filter it by returning false.
-                --
-                -- bufnr: a neovim buffer number
-                -- item: of type aerial.Symbol
-                -- ctx: a record containing the following fields:
-                --   * backend_name: treesitter, lsp, man...
-                --   * lang: info about the language
-                --   * symbols?: specific to the lsp backend
-                --   * symbol?: specific to the lsp backend
-                --   * syntax_tree?: specific to the treesitter backend
-                --   * match?: specific to the treesitter backend, TS query match
-                post_parse_symbol = function(bufnr, item, ctx)
-                    return true
+            -- Invoked after each symbol is parsed, can be used to modify the parsed item,
+            -- or to filter it by returning false.
+            --
+            -- bufnr: a neovim buffer number
+            -- item: of type aerial.Symbol
+            -- ctx: a record containing the following fields:
+            --   * backend_name: treesitter, lsp, man...
+            --   * lang: info about the language
+            --   * symbols?: specific to the lsp backend
+            --   * symbol?: specific to the lsp backend
+            --   * syntax_tree?: specific to the treesitter backend
+            --   * match?: specific to the treesitter backend, TS query match
+            post_parse_symbol = function(bufnr, item, ctx)
+                return true
+            end,
+
+            -- Invoked after all symbols have been parsed and post-processed,
+            -- allows to modify the symbol structure before final display
+            --
+            -- bufnr: a neovim buffer number
+            -- items: a collection of aerial.Symbol items, organized in a tree,
+            --        with 'parent' and 'children' fields
+            -- ctx: a record containing the following fields:
+            --   * backend_name: treesitter, lsp, man...
+            --   * lang: info about the language
+            --   * symbols?: specific to the lsp backend
+            --   * syntax_tree?: specific to the treesitter backend
+            post_add_all_symbols = function(bufnr, items, ctx)
+                return items
+            end,
+
+            -- When true, aerial will automatically close after jumping to a symbol
+            close_on_select = true,
+
+            -- The autocmds that trigger symbols update (not used for LSP backend)
+            update_events = "TextChanged,InsertLeave",
+
+            -- Show box drawing characters for the tree hierarchy
+            show_guides = false,
+
+            -- Customize the characters used when show_guides = true
+            guides = {
+                -- When the child item has a sibling below it
+                mid_item = "├─",
+                -- When the child item is the last in the list
+                last_item = "└─",
+                -- When there are nested child guides to the right
+                nested_top = "│ ",
+                -- Raw indentation
+                whitespace = "  ",
+            },
+
+            -- Set this function to override the highlight groups for certain symbols
+            get_highlight = function(symbol, is_icon, is_collapsed)
+                -- return "MyHighlight" .. symbol.kind
+            end,
+
+            -- Options for opening aerial in a floating win
+            float = {
+                -- Controls border appearance. Passed to nvim_open_win
+                border = "rounded",
+
+                -- Determines location of floating window
+                --   cursor - Opens float on top of the cursor
+                --   editor - Opens float centered in the editor
+                --   win    - Opens float centered in the window
+                relative = "cursor",
+
+                -- These control the height of the floating window.
+                -- They can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
+                -- min_height and max_height can be a list of mixed types.
+                -- min_height = {8, 0.1} means "the greater of 8 rows or 10% of total"
+                max_height = 0.9,
+                height = nil,
+                min_height = { 8, 0.1 },
+
+                override = function(conf, source_winid)
+                    -- This is the config that will be passed to nvim_open_win.
+                    -- Change values here to customize the layout
+                    return conf
                 end,
+            },
 
-                -- Invoked after all symbols have been parsed and post-processed,
-                -- allows to modify the symbol structure before final display
-                --
-                -- bufnr: a neovim buffer number
-                -- items: a collection of aerial.Symbol items, organized in a tree,
-                --        with 'parent' and 'children' fields
-                -- ctx: a record containing the following fields:
-                --   * backend_name: treesitter, lsp, man...
-                --   * lang: info about the language
-                --   * symbols?: specific to the lsp backend
-                --   * syntax_tree?: specific to the treesitter backend
-                post_add_all_symbols = function(bufnr, items, ctx)
-                    return items
-                end,
-
-                -- When true, aerial will automatically close after jumping to a symbol
-                close_on_select = true,
-
-                -- The autocmds that trigger symbols update (not used for LSP backend)
-                update_events = "TextChanged,InsertLeave",
-
-                -- Show box drawing characters for the tree hierarchy
-                show_guides = false,
-
-                -- Customize the characters used when show_guides = true
-                guides = {
-                    -- When the child item has a sibling below it
-                    mid_item = "├─",
-                    -- When the child item is the last in the list
-                    last_item = "└─",
-                    -- When there are nested child guides to the right
-                    nested_top = "│ ",
-                    -- Raw indentation
-                    whitespace = "  ",
+            -- Options for the floating nav windows
+            nav = {
+                border = "rounded",
+                max_height = 0.9,
+                min_height = { 10, 0.1 },
+                max_width = 0.5,
+                min_width = { 0.2, 20 },
+                win_opts = {
+                    cursorline = true,
+                    winblend = 10,
                 },
-
-                -- Set this function to override the highlight groups for certain symbols
-                get_highlight = function(symbol, is_icon, is_collapsed)
-                    -- return "MyHighlight" .. symbol.kind
-                end,
-
-                -- Options for opening aerial in a floating win
-                float = {
-                    -- Controls border appearance. Passed to nvim_open_win
-                    border = "rounded",
-
-                    -- Determines location of floating window
-                    --   cursor - Opens float on top of the cursor
-                    --   editor - Opens float centered in the editor
-                    --   win    - Opens float centered in the window
-                    relative = "cursor",
-
-                    -- These control the height of the floating window.
-                    -- They can be integers or a float between 0 and 1 (e.g. 0.4 for 40%)
-                    -- min_height and max_height can be a list of mixed types.
-                    -- min_height = {8, 0.1} means "the greater of 8 rows or 10% of total"
-                    max_height = 0.9,
-                    height = nil,
-                    min_height = { 8, 0.1 },
-
-                    override = function(conf, source_winid)
-                        -- This is the config that will be passed to nvim_open_win.
-                        -- Change values here to customize the layout
-                        return conf
-                    end,
+                -- Jump to symbol in source window when the cursor moves
+                autojump = false,
+                -- Show a preview of the code in the right column, when there are no child symbols
+                preview = false,
+                -- Keymaps in the nav window
+                keymaps = {
+                    ["<CR>"] = "actions.jump",
+                    ["<2-LeftMouse>"] = "actions.jump",
+                    ["<C-v>"] = "actions.jump_vsplit",
+                    ["<C-s>"] = "actions.jump_split",
+                    ["h"] = "actions.left",
+                    ["l"] = "actions.right",
+                    ["<C-c>"] = "actions.close",
                 },
+            },
 
-                -- Options for the floating nav windows
-                nav = {
-                    border = "rounded",
-                    max_height = 0.9,
-                    min_height = { 10, 0.1 },
-                    max_width = 0.5,
-                    min_width = { 0.2, 20 },
-                    win_opts = {
-                        cursorline = true,
-                        winblend = 10,
-                    },
-                    -- Jump to symbol in source window when the cursor moves
-                    autojump = false,
-                    -- Show a preview of the code in the right column, when there are no child symbols
-                    preview = false,
-                    -- Keymaps in the nav window
-                    keymaps = {
-                        ["<CR>"] = "actions.jump",
-                        ["<2-LeftMouse>"] = "actions.jump",
-                        ["<C-v>"] = "actions.jump_vsplit",
-                        ["<C-s>"] = "actions.jump_split",
-                        ["h"] = "actions.left",
-                        ["l"] = "actions.right",
-                        ["<C-c>"] = "actions.close",
-                    },
+            lsp = {
+                -- If true, fetch document symbols when LSP diagnostics update.
+                diagnostics_trigger_update = false,
+
+                -- Set to false to not update the symbols when there are LSP errors
+                update_when_errors = true,
+
+                -- How long to wait (in ms) after a buffer change before updating
+                -- Only used when diagnostics_trigger_update = false
+                update_delay = 300,
+
+                -- Map of LSP client name to priority. Default value is 10.
+                -- Clients with higher (larger) priority will be used before those with lower priority.
+                -- Set to -1 to never use the client.
+                priority = {
+                    -- pyright = 10,
                 },
+            },
 
-                lsp = {
-                    -- If true, fetch document symbols when LSP diagnostics update.
-                    diagnostics_trigger_update = false,
+            treesitter = {
+                -- How long to wait (in ms) after a buffer change before updating
+                update_delay = 300,
+            },
 
-                    -- Set to false to not update the symbols when there are LSP errors
-                    update_when_errors = true,
+            markdown = {
+                -- How long to wait (in ms) after a buffer change before updating
+                update_delay = 300,
+            },
 
-                    -- How long to wait (in ms) after a buffer change before updating
-                    -- Only used when diagnostics_trigger_update = false
-                    update_delay = 300,
+            asciidoc = {
+                -- How long to wait (in ms) after a buffer change before updating
+                update_delay = 300,
+            },
 
-                    -- Map of LSP client name to priority. Default value is 10.
-                    -- Clients with higher (larger) priority will be used before those with lower priority.
-                    -- Set to -1 to never use the client.
-                    priority = {
-                        -- pyright = 10,
-                    },
-                },
-
-                treesitter = {
-                    -- How long to wait (in ms) after a buffer change before updating
-                    update_delay = 300,
-                },
-
-                markdown = {
-                    -- How long to wait (in ms) after a buffer change before updating
-                    update_delay = 300,
-                },
-
-                asciidoc = {
-                    -- How long to wait (in ms) after a buffer change before updating
-                    update_delay = 300,
-                },
-
-                man = {
-                    -- How long to wait (in ms) after a buffer change before updating
-                    update_delay = 300,
-                },
+            man = {
+                -- How long to wait (in ms) after a buffer change before updating
+                update_delay = 300,
+            },
         })
     end
 }
