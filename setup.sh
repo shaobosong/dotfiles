@@ -38,6 +38,7 @@ set -- \
     ".tmux.conf" \
 
 mkdir -pv "${HOME}/.config"
+mkdir -pv "${HOME}/.ssh"
 
 for file in "${@}"; do
     backup "${HOME}/${file}"
