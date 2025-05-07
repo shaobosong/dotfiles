@@ -9,9 +9,9 @@ return {
             auto_install = false,
             ignore_install = {},
             highlight = {
-                enable = true,
+                enable = false,
                 additional_vim_regex_highlighting = false,
-                disable = { "c", "cpp", "c3" },
+                -- disable = { "c", "cpp", "c3" },
             },
             indent = {
                 enable = false,
