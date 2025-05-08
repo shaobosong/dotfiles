@@ -4,7 +4,7 @@
 
 ### Dependencies
 
-- GNU coreutils(`dirname`, `readlink`, `mkdir`, `rm`, `mv`, `ln`)
+- [Uutils](https://github.com/uutils)/[GNU](https://www.gnu.org/software/) coreutils(`dirname`, `readlink`, `mkdir`, `rm`, `mv`, `ln`)
 
 ### Description
 
@@ -14,5 +14,5 @@
 ### Usage
 
 ```sh
-sh -c setup.sh
+sh -c ./setup.sh
 ```
