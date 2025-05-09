@@ -112,6 +112,7 @@ _bash_d="${_dotfiles_root}/.bash.d"
 alias ci="source ${_bash_d}/cd-index.sh"
 alias wl="${_bash_d}/win-ldd.sh"
 alias ts="${_bash_d}/tar-scp.sh"
+alias mkimg="${_bash_d}/make_image.sh"
 
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
