@@ -2,7 +2,7 @@
 
 ## Setup
 
-### Dependencies
+### Requirements
 
 - [Uutils](https://github.com/uutils)/[GNU](https://www.gnu.org/software/) coreutils(`dirname`, `readlink`, `mkdir`, `rm`, `mv`, `ln`)
 
