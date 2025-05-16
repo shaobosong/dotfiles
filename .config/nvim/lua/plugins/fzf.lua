@@ -35,8 +35,10 @@ return {
     config = function()
         local fzf_lua = require("fzf-lua")
         local fzf_actions = fzf_lua.actions
-        local fzf_history_file = vim.fn.stdpath("data") .. "/lazy/fzf/bin/.nvim-fzf-history"
-        local fzf_search_history_file = vim.fn.stdpath("data") .. "/lazy/fzf/bin//.nvim-fzf-search-history"
+        local fzf_history = {
+            ["default"] = vim.fn.stdpath("data") .. "/lazy/fzf/bin/.nvim-fzf-history",
+            ["search"] = vim.fn.stdpath("data") .. "/lazy/fzf/bin/.nvim-fzf-search-history",
+        }
         fzf_lua.setup({
             fzf_bin = vim.fn.stdpath("data") .. "/lazy/fzf/bin/fzf",
             winopts  = {
@@ -45,7 +47,7 @@ return {
             fzf_opts = {
                 -- ignorecase
                 ["-i"] = true,
-                ["--history"] = fzf_history_file,
+                ["--history"] = fzf_history["default"],
             },
             keymap = {
                 builtin = {
@@ -82,7 +84,7 @@ return {
             },
             grep = {
                 fzf_opts = {
-                    ["--history"] = fzf_search_history_file,
+                    ["--history"] = fzf_history["search"],
                 },
             },
         })
@@ -128,7 +130,7 @@ return {
                     ["-i"] = true,
                     ["--delimiter"] = ":",
                     ["--nth"]  = '3..',
-                    ["--history"] = fzf_search_history_file,
+                    ["--history"] = fzf_history["search"],
                 },
                 git_icons = false,
                 file_icons = false,
