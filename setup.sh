@@ -33,6 +33,7 @@ set -- \
     ".config/fd" \
     ".config/nvim" \
     ".config/ripgrep" \
+    ".gdb" \
     ".profile" \
     ".ssh/config" \
     ".tmux.conf" \
