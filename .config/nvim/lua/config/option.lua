@@ -65,3 +65,6 @@ end
 
 -- Allow hidden buffers
 vim.opt.hidden = true
+
+-- Jump behavior
+vim.opt.jumpoptions = 'stack,view'
