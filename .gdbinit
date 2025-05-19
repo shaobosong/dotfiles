@@ -57,7 +57,7 @@ end
 define tstepi
     if $schedule_multiple
         set schedule-multiple off
-        si
+        stepi
         set schedule-multiple on
     else
         si
@@ -65,17 +65,62 @@ define tstepi
 end
 
 document tstepi
-Single-step one machine instruction with thread locking.
+Step one instruction with thread locking, but proceed through subroutine calls.
 Temporarily disable other threads during stepping.
 end
 
-define tsi
-    tstepi
+alias tsi = tstepi
+
+define tnexti
+    if $schedule_multiple
+        set schedule-multiple off
+        nexti
+        set schedule-multiple on
+    else
+        si
+    end
 end
 
-document tsi
-Alias for tstepi.
+document tnexti
+Step one instruction with thread locking.
+Temporarily disable other threads during stepping.
 end
+
+alias tni = tnexti
+
+define tstep
+    if $schedule_multiple
+        set schedule-multiple off
+        step
+        set schedule-multiple on
+    else
+        si
+    end
+end
+
+document tstep
+Step program with thread locking until it reaches a different source line.
+Temporarily disable other threads during stepping.
+end
+
+alias ts = tstep
+
+define tnext
+    if $schedule_multiple
+        set schedule-multiple off
+        next
+        set schedule-multiple on
+    else
+        si
+    end
+end
+
+document tnext
+Step program with thread locking, and step over the subroutine calls.
+Temporarily disable other threads during stepping.
+end
+
+alias tn = tnext
 
 dashboard registers -style list "rax rbx rcx rdx rsi rdi rbp rsp r8 r9 r10 r11 r12 r13 r14 r15 rip eflags cs ss ds es fs gs"
 # fctrl fstat ftag fiseg fioff foseg fooff fop fs_base gs_base k_gs_base cr0 cr2 cr3 cr4 cr8 efer"
