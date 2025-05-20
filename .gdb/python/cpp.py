@@ -15,8 +15,8 @@ class StdCppPrinterLoader:
     # Path templates with version-aware patterns
     SEARCH_TEMPLATES = [
         # GCC version-specific paths (modern installations)
-        '/usr/share/gcc-*/python/libstdcxx',
-        '/usr/lib/gcc/*/*/*/python/libstdcxx',  # Multi-arch support
+        '/usr/share/gcc-*/python',
+        '/usr/lib/gcc/*/*/*/python',  # Multi-arch support
 
         # Legacy paths (traditional distributions)
         '/usr/share/gcc/python',
@@ -57,7 +57,7 @@ class StdCppPrinterLoader:
             Tuple of (python_path, printer_path) if valid, None otherwise
         """
         python_path = os.path.dirname(base_path)  # Parent directory for Python imports
-        printer_module = os.path.join(base_path, 'v6', 'printers.py')
+        printer_module = os.path.join(base_path, 'libstdcxx', 'v6', 'printers.py')
 
         if os.path.exists(printer_module):
             return (python_path, base_path)
@@ -106,7 +106,7 @@ class StdCppPrinterLoader:
             import importlib.util
             spec = importlib.util.spec_from_file_location(
                 "libstdcxx_printers",
-                os.path.join(printer_path, 'v6', 'printers.py')
+                os.path.join(printer_path, 'libstdcxx', 'v6', 'printers.py')
             )
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
