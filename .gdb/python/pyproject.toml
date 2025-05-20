@@ -1,0 +1,9 @@
+[project]
+name = "gdb_plugin"
+version = "0.1.0"
+description = "GDB Plugin"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "prompt-toolkit==3.0.46",
+]

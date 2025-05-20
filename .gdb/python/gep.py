@@ -51,6 +51,12 @@ if os.path.exists(venv_path):
     site.addsitedir(site_pkgs_path)
 else:
     try:
+        """
+        > curl -LjO https://files.pythonhosted.org/packages/5d/0f/2a8cf0881833cae8a2b50f0ce63ba4662c44473640c1feeb054f19d33459/prompt_toolkit-3.0.46.tar.gz
+        > tar zxvf prompt_toolkit-3.0.46.tar.gz
+        > cd prompt_toolkit-3.0.46
+        > sudo ./setup.py install
+        """
         import prompt_toolkit
 
         del prompt_toolkit
