@@ -6,6 +6,9 @@ source ~/.gdb/python/gep.py
 # GDB Dashboard
 source ~/.gdb/python/dashboard.py
 
+# GDB List Print
+source ~/.gdb/python/listprint.py
+
 # GDB C++
 source ~/.gdb/python/cpp.py
 
