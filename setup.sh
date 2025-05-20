@@ -34,6 +34,7 @@ set -- \
     ".config/nvim" \
     ".config/ripgrep" \
     ".gdb" \
+    ".gdbinit" \
     ".profile" \
     ".ssh/config" \
     ".tmux.conf" \
