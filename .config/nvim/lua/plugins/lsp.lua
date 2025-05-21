@@ -17,6 +17,9 @@ return {
     },
     {
         "neovim/nvim-lspconfig",
+        cond = function ()
+            return vim.fn.has('nvim-0.11') == 1
+        end,
         lazy = true,
         event = { "BufReadPost", "BufNewFile" },
         dependencies = {
