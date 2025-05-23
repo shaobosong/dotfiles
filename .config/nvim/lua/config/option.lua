@@ -68,3 +68,6 @@ vim.opt.hidden = true
 
 -- Jump behavior
 vim.opt.jumpoptions = 'stack,view'
+
+-- Operator-pending timeout
+vim.opt.timeout = false
