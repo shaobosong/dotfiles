@@ -1,15 +1,18 @@
+" Vim syntax file
+" Language: C3
+
 if exists("b:current_syntax")
   finish
 endif
 
-syn match c3Identifier  display "\v<_*[a-z][A-Za-z0-9_]*>"
+syn match c3Identifier  display "\v<_*[a-z]\w*>"
 syn match c3Function    display "\zs\(\w*\)*\s*\ze("
 syn match c3Macro       display "@\zs\(\w*\)*\s*\ze("
-syn match c3UserType    display "_*[A-Z][a-zA-Z0-9_]\+"
-syn match c3UserAttr    display "@_*[A-Z][a-zA-Z0-9_]\+"
-syn match c3GlobalConst display "_*[A-Z][A-Z0-9_]\+"
+syn match c3UserType    display "\v<_*[A-Z]\w*[a-z]\w*>"
+syn match c3UserAttr    display "@_*[A-Z]\w\+"
+syn match c3GlobalConst display "\v<_*[A-Z][A-Z0-9_]+>"
 syn match c3Label       display "^\s*_*[A-Z][A-Z0-9_]\+:"
-syn match c3ComptimeId  display "\v\$<_*[a-z][A-Za-z0-9_]*>"
+syn match c3ComptimeId  display "\v\$<_*[a-z]\w*>"
 
 syn match c3Number display "\v<0[Xx][0-9A-Fa-f](_*[0-9A-Fa-f])*>"
 syn match c3Number display "\v<0[Oo][0-7](_*[0-7])*>"
@@ -35,12 +38,16 @@ syn match c3Base64 display "\v<b64'([ \f\n\t\v]?[A-Za-z0-9+/][ \f\n\t\vA-Za-z0-9
 syn match c3Base64 display "\v<b64\"([ \f\n\t\v]?[A-Za-z0-9+/][ \f\n\t\vA-Za-z0-9+/]+)+(\=|\=\=)?\""
 syn match c3Base64 display "\v<b64`([ \f\n\t\v]?[A-Za-z0-9+/][ \f\n\t\vA-Za-z0-9+/]+)+(\=|\=\=)?`"
 
-syn match c3String display "\v\"(\\.|[^\\\"])*\""
-syn match c3String display "\v`(``|.)*`"
+syn match c3Format display "%\%(\d\+\$\)\=[-+' #0*]*\%(\d*\|\*\|\*\d\+\$\)\%(\.\%(\d*\|\*\|\*\d\+\$\)\)\=\%([hlLjzt]\|ll\|hh\)\=\%([aAbdoxXOfFeEgGcsp]\|\[\^\=.[^]]*\]\)" contained
+syn match c3Format display "%%" contained
 
-syn region c3Comment display start="\v/\*"   end="\v\*/" contains=c3Comment,c3Todo
-syn region c3Comment display start="\v//"    end="\v$"   contains=c3Todo
-syn region c3Comment display start="\v/\*\*" end="\v\*/" contains=c3Contract,c3Todo
+syn match c3String display "\v\"(\\.|[^\\\"])*\"" contains=c3Format
+syn match c3String display "\v`(``|.)*`"          contains=c3Format
+
+syn region c3Comment display start="\v/\*"   end="\v\*/"  contains=c3Comment,c3Todo
+syn region c3Comment display start="\v//"    end="\v$"    contains=c3Todo
+syn region c3Comment display start="\v/\*\*" end="\v\*/"  contains=c3Contract,c3Todo
+syn region c3Comment display start="\v\<\*"  end="\v\*\>" contains=c3Contract,c3Todo
 
 syn match c3Contract contained "\v<\@require>"
 syn match c3Contract contained "\v<\@ensure>"
@@ -61,7 +68,7 @@ syn keyword c3Keyword
       \ module import
 
 syn keyword c3Repeat
-      \ do while while 
+      \ do while
       \ for foreach foreach_r
       \ continue break
 
@@ -147,17 +154,19 @@ else
 endif
 
 hi def link c3Function     Function
-hi def link c3Function     Macro
+hi def link c3Macro        Macro
 hi def link c3BuiltinType  Type
 hi def link c3Label        Label
 hi def link c3UserType     Type
-hi def link c3Keyword      Keyword
+hi def link c3Todo         Todo
+hi def link c3Keyword      Statement
 hi def link c3ComptimeKw   Keyword
 hi def link c3Specifier    StorageClass
 hi def link c3Repeat       Repeat
 hi def link c3Boolean      Boolean
 hi def link c3Null         Boolean
 hi def link c3GlobalConst  Constant
+hi def link c3Format       Special
 hi def link c3String       String
 hi def link c3HexBytes     String
 hi def link c3Base64       String
