@@ -111,6 +111,7 @@ return {
                     config = {
                         cmd = {
                             'c3lsp',
+                            '-diagnostics-delay', '500',
                         },
                         filetypes = { 'c3', 'c3i', "c3t" },
                     },
