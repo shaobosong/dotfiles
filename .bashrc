@@ -125,7 +125,7 @@ alias curl='\curl -x socks5h://$(\awk '\''$2 == "00000000" {print strtonum("0x" 
 
 # exports
 export PROMPT_COMMAND="history -a; #history -n"
-export FZF_DEFAULT_OPTS="--bind 'alt-j:down,alt-k:up,alt-l:close,ctrl-alt-h:backward-kill-word'"
+export FZF_DEFAULT_OPTS="--bind=alt-j:down,alt-k:up,alt-l:close,ctrl-alt-h:backward-kill-word"
 export DELTA_FEATURES='+side-by-side'
 export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
 export RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
