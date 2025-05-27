@@ -111,6 +111,8 @@ if ! shopt -oq posix; then
 fi
 
 # aliases
+alias ci="source ${_bash_d}/misc/cd-index.sh"
+
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
 alias 2dec='printf %d\\n'
