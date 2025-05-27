@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+JOBS=`nproc`
+PROGNAME=$(basename $0)
+ROOT=$PWD
+BUILD=${ROOT}/build
+INSTALL=${BUILD}/install
+
+TYPE=debug
+EXTRA_CONFIG_OPTS=()
+
+function panic ()
+{
+    1>&2 echo "Error: $@"
+    exit 1
+}
+
+function parse_args () {
+    while test $# -gt 0; do
+        optarg="${1#*=}"
+        case $1 in
+            -\? | -h | --help)
+                echo $"Usage: $PROGNAME [options] [configure options]
+      --help                    Print this message
+      --type=<debug|release>    Build type (default: debug)"
+                exit 0
+                ;;
+            --type=debug | --type=release)
+                TYPE=$optarg
+                shift
+                ;;
+            *)
+                EXTRA_CONFIG_OPTS+=(
+                    "${1}"
+                )
+                shift
+                ;;
+        esac
+    done
+
+    # build type
+    if test "${TYPE}" = "debug"; then
+        CFLAGS="${CFLAGS} -O0 -g3"
+        LDFLAGS="${LDFLAGS} -O0 -g3"
+        EXTRA_CONFIG_OPTS+=(
+            "--enable-debug"
+        )
+    fi
+}
+
+function build_init () {
+    rm -rvf ${BUILD}
+    mkdir -pv ${BUILD}
+    cd ${BUILD}
+}
+
+function build () {
+    configure_cmd=(
+        "${ROOT}/configure"
+        "--prefix=${INSTALL}"
+        "${EXTRA_CONFIG_OPTS[@]}"
+    )
+    eval "${configure_cmd[@]}"
+    make -C ${BUILD} -j ${JOBS}
+    make -C ${BUILD} install
+}
+
+parse_args ${@}
+build_init
+build
