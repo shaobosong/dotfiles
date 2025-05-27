@@ -131,6 +131,7 @@ export GOMODCACHE=$HOME/.cache/go/pkg/mod
 export GOPATH=$HOME/.go
 export GOPROXY=https://goproxy.cn
 export PATH=$_bash_d/link:$PATH
+export PATH=$HOME/.cargo/bin:$PATH
 
 # sources
 if test -f /usr/share/fzf/completion.bash; then
