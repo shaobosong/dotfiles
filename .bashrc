@@ -140,6 +140,3 @@ fi
 if test -f /usr/share/fzf/key-bindings.bash; then
     source /usr/share/fzf/key-bindings.bash
 fi
-if test -f "$HOME/.cargo/env"; then
-    . "$HOME/.cargo/env"
-fi
