@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+set -ex
+
+JOBS=`nproc`
+PROGNAME=$(basename $0)
+ROOT=$PWD
+BUILD=${ROOT}/build
+INSTALL=${BUILD}/install
+
+TYPE=debug
+EXTRA_CONFIG_OPTS=("--enable-slirp")
+TARGET_LIST="x86_64-softmmu"
+
+function panic ()
+{
+    1>&2 echo "Error: $@"
+    exit 1
+}
+
+function parse_args () {
+    while test $# -gt 0; do
+        optarg="${1#*=}"
+        case $1 in
+            -\? | -h | --help)
+                echo $"Usage: $PROGNAME [options]
+      --help                    Print this message
+      --type=<debug|release>    Build type (default: debug)
+      --target-list=LIST        Guest targets (defalut: x86_64-softmmu)"
+                exit 0
+                ;;
+            --type=debug | --type=release)
+                TYPE=$optarg
+                shift
+                ;;
+            --target-list=*)
+                TARGET_LIST=$optarg
+                shift
+                ;;
+            *)
+                panic "Unknown option '$1', see '-h' or '--help' for help."
+                ;;
+        esac
+    done
+
+    # build type
+    if test x${TYPE} = x"debug"; then
+        EXTRA_CONFIG_OPTS+=(
+            "--extra-cflags=\"-O0 -g3\""
+            "--extra-ldflags=\"-O0 -g3\""
+            "--enable-debug"
+            "--disable-strip"
+        )
+    fi
+}
+
+function build_init () {
+    rm -rvf ${BUILD}
+    mkdir -pv ${BUILD}
+    cd ${BUILD}
+}
+
+function build () {
+    configure_cmd=(
+        "${ROOT}/configure"
+        "--prefix=${INSTALL}"
+        "--target-list=${TARGET_LIST}"
+        "${EXTRA_CONFIG_OPTS[@]}"
+    )
+    eval "${configure_cmd[@]}"
+    make -C ${BUILD} -j ${JOBS}
+    make -C ${BUILD} install
+}
+
+parse_args ${@}
+build_init
+build
