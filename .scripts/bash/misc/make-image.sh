@@ -44,7 +44,7 @@ function image_nbd_rootfs() {
     mount $NBD_DEVICE $TEMP_ROOTFS_DIR
 }
 
-function download_rootfs() {
+function _download_rootfs() {
     echo "Downloading rootfs..."
     temp_rootfs_dir=$1
     # debian()
@@ -83,48 +83,48 @@ function download_rootfs() {
     # tar -C $temp_rootfs_dir -xJf void-x86_64-musl-ROOTFS.tar.xz
 }
 
-function chroot_run() {
+function _chroot_run() {
     /usr/sbin/chroot $TEMP_ROOTFS_DIR <<< "$@"
 }
 
-function update_rootfs() {
+function _update_rootfs() {
     echo "Updating rootfs..."
     # generic
-    chroot_run "chsh -s /bin/bash root"
-    chroot_run "useradd -m -s /bin/bash ${USER}"
-    chroot_run "sed -i 's|^\(${USER}\):[^:]*:|\1:${SHADOW_PASSWD}:|' /etc/shadow"
+    _chroot_run "chsh -s /bin/bash root"
+    _chroot_run "useradd -m -s /bin/bash ${USER}"
+    _chroot_run "sed -i 's|^\(${USER}\):[^:]*:|\1:${SHADOW_PASSWD}:|' /etc/shadow"
 
     # Error: have a problem
-    # chroot_run "echo 'root:$PASSWD' | chpasswd --root /"
-    # chroot_run "echo 'user:$PASSWD' | chpasswd --root /"
+    # _chroot_run "echo 'root:$PASSWD' | chpasswd --root /"
+    # _chroot_run "echo 'user:$PASSWD' | chpasswd --root /"
     # echo "root:$PASSWD" | chpasswd --root $(readlink -e $TEMP_ROOTFS_DIR)
     # echo "user:$PASSWD" | chpasswd --root $(readlink -e $TEMP_ROOTFS_DIR)
 
     # # debian 12
-    # chroot_run "usermod -aG sudo user"
-    # chroot_run "echo -e 'auto enp0s3\niface enp0s3 inet dhcp' > /etc/network/interfaces"
+    # _chroot_run "usermod -aG sudo user"
+    # _chroot_run "echo -e 'auto enp0s3\niface enp0s3 inet dhcp' > /etc/network/interfaces"
 
     # # debian sid
-    # chroot_run "echo -e '[Match]\nName=enp0s3\n[Network]\nDHCP=yes' > /etc/systemd/network/20-wired.network"
+    # _chroot_run "echo -e '[Match]\nName=enp0s3\n[Network]\nDHCP=yes' > /etc/systemd/network/20-wired.network"
 
     # # ubuntu
-    # chroot_run "echo -e 'network:\n  version: 2\n  ethernets:\n    enp0s3:\n      dhcp4: true' > /etc/netplan/01-netcfg.yaml"
+    # _chroot_run "echo -e 'network:\n  version: 2\n  ethernets:\n    enp0s3:\n      dhcp4: true' > /etc/netplan/01-netcfg.yaml"
 
     # voidlinux
-    chroot_run "usermod -aG wheel ${USER}"
-    chroot_run "sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL:ALL)\s\+ALL\)/\1/' /etc/sudoers"
-    chroot_run "cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/"
-    chroot_run "sed -i 's|https://repo-default.voidlinux.org|https://mirrors.tuna.tsinghua.edu.cn/voidlinux|g' /etc/xbps.d/*-repository-*.conf"
-    # chroot_run "rm -rf /etc/runit/runsvdir/default/agetty-tty*"
-    chroot_run "sed -i 's/^TERM_NAME=.*$/TERM_NAME=xterm-256color/' /etc/sv/agetty-hvc0/conf"
-    chroot_run "ln -sfn /etc/sv/agetty-hvc0 /etc/runit/runsvdir/default/agetty-hvc0"
-    chroot_run "ln -sfn /etc/sv/agetty-ttyS0 /etc/runit/runsvdir/default/agetty-ttyS0"
-    chroot_run "ln -sfn /etc/sv/dhcpcd /etc/runit/runsvdir/default/dhcpcd"
-    chroot_run "ln -sfn /etc/sv/sshd /etc/runit/runsvdir/default/sshd"
+    _chroot_run "usermod -aG wheel ${USER}"
+    _chroot_run "sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL:ALL)\s\+ALL\)/\1/' /etc/sudoers"
+    _chroot_run "cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/"
+    _chroot_run "sed -i 's|https://repo-default.voidlinux.org|https://mirrors.tuna.tsinghua.edu.cn/voidlinux|g' /etc/xbps.d/*-repository-*.conf"
+    # _chroot_run "rm -rf /etc/runit/runsvdir/default/agetty-tty*"
+    _chroot_run "sed -i 's/^TERM_NAME=.*$/TERM_NAME=xterm-256color/' /etc/sv/agetty-hvc0/conf"
+    _chroot_run "ln -sfn /etc/sv/agetty-hvc0 /etc/runit/runsvdir/default/agetty-hvc0"
+    _chroot_run "ln -sfn /etc/sv/agetty-ttyS0 /etc/runit/runsvdir/default/agetty-ttyS0"
+    _chroot_run "ln -sfn /etc/sv/dhcpcd /etc/runit/runsvdir/default/dhcpcd"
+    _chroot_run "ln -sfn /etc/sv/sshd /etc/runit/runsvdir/default/sshd"
 }
 
 function create_rootfs() {
-    download_rootfs $TEMP_ROOTFS_DIR
+    _download_rootfs $TEMP_ROOTFS_DIR
 
     # mkdir -p $TEMP_ROOTFS_DIR/dev \
     # 	$TEMP_ROOTFS_DIR/proc \
@@ -133,21 +133,21 @@ function create_rootfs() {
     # mount --bind /proc $TEMP_ROOTFS_DIR/proc
     # mount --bind /sys $TEMP_ROOTFS_DIR/sys
 
-    update_rootfs
+    _update_rootfs
 }
 
-function umount_checked() {
+function _umount_checked() {
     if mountpoint -q "$@"; then
         umount "$@"
     fi
 }
 
 function cleanup() {
-    # umount_checked $TEMP_ROOTFS_DIR/dev || :
-    # umount_checked $TEMP_ROOTFS_DIR/proc || :
-    # umount_checked $TEMP_ROOTFS_DIR/sys || :
+    # _umount_checked $TEMP_ROOTFS_DIR/dev || :
+    # _umount_checked $TEMP_ROOTFS_DIR/proc || :
+    # _umount_checked $TEMP_ROOTFS_DIR/sys || :
 
-    umount_checked $TEMP_ROOTFS_DIR || :
+    _umount_checked $TEMP_ROOTFS_DIR || :
     rm -rf $TEMP_ROOTFS_DIR || :
     ${QEMU_NBD} -d $NBD_DEVICE || :
     # modprobe -r nbd || :
