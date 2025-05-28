@@ -25,14 +25,14 @@ function parse_args () {
             -\? | -h | --help)
                 echo $"Usage: $_PROGNAME [options]
 
-options:
+Options:
     --help              print this message
     --config=CONFIG     configure target (default: menuconfig)
 
-environment variables:
-    SOURCE              source path (default: $SOURCE)
-    BUILD               output path (default: $BUILD)
-    INSTALL             install path (default: $INSTALL)"
+Environment variables:
+    SOURCE              source path (default: .)
+    BUILD               output path (default: ./build)
+    INSTALL             install path (default: ./build/install)"
                 exit 0
                 ;;
             --config=*)
