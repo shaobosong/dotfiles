@@ -12,6 +12,9 @@ NBD_DEVICE=/dev/nbd0
 ROOTFS_IMAGE=rootfs.qcow2
 ROOTFS_IMAGE_SIZE=64G
 
+QEMU_IMG=${QEMU_IMG:-qemu-img}
+QEMU_NBD=${}
+
 EXIT_CODE=1
 
 function check_uid() {
@@ -24,7 +27,7 @@ function check_uid() {
 
 function create_image() {
     echo "Creating qcow2 format image..."
-    qemu-img create -f qcow2 $ROOTFS_IMAGE $ROOTFS_IMAGE_SIZE
+    ${QEMU_IMG} create -f qcow2 $ROOTFS_IMAGE $ROOTFS_IMAGE_SIZE
 }
 
 # image ---- device ---- mountpoint
@@ -32,7 +35,7 @@ function image_nbd_rootfs() {
     modprobe nbd
     # image ---- device
     echo "Connecting $ROOTFS_IMAGE to $NBD_DEVICE..."
-    qemu-nbd -c $NBD_DEVICE $ROOTFS_IMAGE
+    ${QEMU_NBD} -c $NBD_DEVICE $ROOTFS_IMAGE
     # partition
     # cfdisk $NBD_DEVICE
     mkfs.ext4 $NBD_DEVICE
@@ -146,7 +149,7 @@ function cleanup() {
 
     umount_checked $TEMP_ROOTFS_DIR || :
     rm -rf $TEMP_ROOTFS_DIR || :
-    qemu-nbd -d $NBD_DEVICE || :
+    ${QEMU_NBD} -d $NBD_DEVICE || :
     # modprobe -r nbd || :
 
     if test $EXIT_CODE -eq 0; then

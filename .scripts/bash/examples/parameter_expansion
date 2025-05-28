@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Use Default Value if Null or Unset.
+: ${VAR:-default}
+
+# Use Default Value if Unset.
+: ${VAR-default}
+
+# Assign Default Value if Null or Unset.
+: ${VAR:=default}
+
+# Assign Default Value if Unset.
+: ${VAR=default}
+
+# Indicate Error if Null or Unset.
+: ${VAR:?"Null or unset"}
+
+# Indicate Error if Unset.
+: ${VAR?"Unset"}
+
+# Use Alternative Value if Set and Not Null.
+: ${VAR:+alternative}
+
+# Use Alternative Value if Set.
+: ${VAR+alternative}
+
+# String Length.
+: ${#VAR}
+
+# Remove Smallest Suffix Pattern.
+: ${VAR%word}
+
+# Remove Largest Suffix Pattern.
+: ${VAR%%word}
+
+# Remove Smallest Prefix Pattern.
+: ${VAR#word}
+
+# Remove Largest Prefix Pattern.
+: ${VAR##word}

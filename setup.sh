@@ -29,13 +29,13 @@ backup() {
 # version 0.2
 set -- \
     ".bashrc" \
-    ".bash.d" \
     ".config/fd" \
     ".config/nvim" \
     ".config/ripgrep" \
     ".gdb" \
     ".gdbinit" \
     ".profile" \
+    ".scripts" \
     ".ssh/config" \
     ".tmux.conf" \
 

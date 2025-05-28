@@ -3,7 +3,7 @@
 # for examples
 
 _dotfiles_root=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
-_bash_d="${_dotfiles_root}/.bash.d"
+_scripts="${_dotfiles_root}/.scripts/bash"
 
 # If not running interactively, don't do anything
 case $- in
@@ -111,7 +111,7 @@ if ! shopt -oq posix; then
 fi
 
 # aliases
-alias ci="source ${_bash_d}/misc/cd-index.sh"
+alias ci="source ${_scripts}/misc/cd-index.sh"
 
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
@@ -130,7 +130,7 @@ export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 export GOMODCACHE=$HOME/.cache/go/pkg/mod
 export GOPATH=$HOME/.go
 export GOPROXY=https://goproxy.cn
-export PATH=$_bash_d/link:$PATH
+export PATH=$_scripts/link:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
 
 # sources
