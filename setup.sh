@@ -46,5 +46,5 @@ for file in "${@}"; do
     ln -nsTv "${ROOT}/${file}" "${HOME}/${file}"
 done
 
-echo "Success"
+echo "Succeed"
 exit 0
