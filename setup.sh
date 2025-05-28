@@ -37,6 +37,7 @@ set -- \
     ".scripts" \
     ".ssh/config" \
     ".tmux.conf" \
+    ".vimrc"
 
 mkdir -pv "${HOME}/.config"
 mkdir -pv "${HOME}/.ssh"
