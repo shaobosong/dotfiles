@@ -13,7 +13,7 @@ ROOTFS_IMAGE=rootfs.qcow2
 ROOTFS_IMAGE_SIZE=64G
 
 QEMU_IMG=${QEMU_IMG:-qemu-img}
-QEMU_NBD=${}
+QEMU_NBD=${QEMU_NBD:-qemu-nbd}
 
 EXIT_CODE=1
 
