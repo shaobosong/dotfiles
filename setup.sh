@@ -32,7 +32,6 @@ set -- \
     ".config/fd" \
     ".config/nvim" \
     ".config/ripgrep" \
-    ".gdb" \
     ".gdbinit" \
     ".profile" \
     ".scripts" \
