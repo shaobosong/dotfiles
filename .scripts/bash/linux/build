@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+_PROGNAME=$(basename $0)
+_ROOT=$PWD
+
+JOBS=${JOBS:-`nproc`}
+SOURCE=${SOURCE:-$_ROOT}
+BUILD=${BUILD:-"${_ROOT}/build"}
+INSTALL=${INSTALL:-"${BUILD}/install"}
+
+CONFIG_TARGET=menuconfig
+
+function panic ()
+{
+    1>&2 echo "Error: $@"
+    exit 1
+}
+
+function parse_args () {
+    while test $# -gt 0; do
+        optarg="${1#*=}"
+        case $1 in
+            -\? | -h | --help)
+                echo $"Usage: $_PROGNAME [options]
+
+options:
+    --help              print this message
+    --config=CONFIG     configure target (default: menuconfig)
+
+environment variables:
+    SOURCE              source path (default: $SOURCE)
+    BUILD               output path (default: $BUILD)
+    INSTALL             install path (default: $INSTALL)"
+                exit 0
+                ;;
+            --config=*)
+                CONFIG_TARGET=$optarg
+                shift
+                ;;
+            *)
+                panic "Unknow option: $1, see '-h' or '--help' for help."
+                shift
+                ;;
+        esac
+    done
+}
+
+function build_init () {
+    export KBUILD_VERBOSE=0
+    export KBUILD_OUTPUT=$BUILD
+    export INSTALL_PATH=$INSTALL
+    export INSTALL_MOD_PATH=$INSTALL
+}
+
+function build () {
+    # 'make help' for help
+    make -C $SOURCE mrproper
+    make -C $SOURCE $CONFIG_TARGET
+    make -C $SOURCE -j $JOBS all
+    make -C $BUILD install
+    make -C $BUILD modules_install
+}
+
+parse_args ${@}
+build_init
+build
+
+echo "Succeed"
