@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+_PROGNAME=$(basename $0)
+_ROOT=$PWD
+
+JOBS=`nproc`
+SOURCE=${SOURCE:-$_ROOT}
+BUILD=${BUILD:-"${SOURCE}/build"}
+INSTALL=${INSTALL:-"${BUILD}/install"}
+
+TYPE=debug
+EXTRA_CONFIG_OPTS=()
+
+function panic ()
+{
+    1>&2 echo "Error: $@"
+    exit 1
+}
+
+function parse_args () {
+    while test $# -gt 0; do
+        optarg="${1#*=}"
+        case $1 in
+            -\? | -h | --help)
+                echo $"Usage: $_PROGNAME [options] [meson options]
+Options:
+    -h, --help              Print this message
+
+    --source=PATH           Source path (default: .)
+    --build=PATH            Output path (default: ./build)
+    --install=PATH          Install path (default: ./build/install)
+
+    --jobs=N                Run N jobs in parallel
+    --type=<debug|release>  Build type (default: debug)"
+                exit 0
+                ;;
+            --source=*)
+                SOURCE=$optarg
+                shift
+                ;;
+            --build=*)
+                BUILD=$optarg
+                shift
+                ;;
+            --install=*)
+                INSTALL=$optarg
+                shift
+                ;;
+            --jobs=[0-9]*)
+                JOBS=$optarg
+                shift
+                ;;
+            --type=debug | --type=release)
+                TYPE=$optarg
+                shift
+                ;;
+            *)
+                EXTRA_CONFIG_OPTS+=(
+                    "${1}"
+                )
+                shift
+                ;;
+        esac
+    done
+
+    # build type
+    if test "${TYPE}" = "debug"; then
+        EXTRA_CONFIG_OPTS+=(
+            "--buildtype debug"
+            "--debug"
+        )
+    fi
+}
+
+function build_init () {
+    rm -rvf ${BUILD}
+    mkdir -pv ${BUILD}
+    cd ${BUILD}
+}
+
+function build () {
+    setup_cmd=(
+        "/usr/bin/meson"
+        "setup"
+        "--prefix=${INSTALL}"
+        "${EXTRA_CONFIG_OPTS[@]}"
+        "$BUILD"
+        "$SOURCE"
+    )
+    eval "${setup_cmd[@]}"
+    compile_cmd=(
+        "/usr/bin/meson"
+        "compile"
+        "-C"
+        "${BUILD}"
+        "-j"
+        "${JOBS}"
+    )
+    eval "${compile_cmd[@]}"
+    test_cmd=(
+        "/usr/bin/meson"
+        "test"
+        "-C"
+        "${BUILD}"
+    )
+    eval "${test_cmd[@]}"
+    install_cmd=(
+        "/usr/bin/meson"
+        "install"
+        "-C"
+        "${BUILD}"
+    )
+    eval "${install_cmd[@]}"
+}
+
+parse_args ${@}
+build_init
+build
+
+echo "Succeed"
