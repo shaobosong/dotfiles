@@ -5,7 +5,10 @@ source ~/.scripts/gdb/generic/builtin.gdb
 source ~/.scripts/gdb/generic/command.gdb
 
 # GDB Enhanced Prompt
-source ~/.scripts/gdb/python/gep.py
+# source ~/.scripts/gdb/python/gep.py
+
+# GDB FZF
+source ~/.scripts/gdb/python/fzf.py
 
 # GDB Dashboard
 source ~/.scripts/gdb/python/dashboard.py

@@ -9,7 +9,7 @@ set confirm off
 set demangle-style gnu-v3
 
 set history filename ~/.gdb_history
-set history remove-duplicates 100
+# set history remove-duplicates 100
 set history save on
 
 set print array off
