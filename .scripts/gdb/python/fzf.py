@@ -195,17 +195,15 @@ def get_fzf_result(query: bytes, items: List[bytes]) -> bytes:
         "--bind=tab:down",
         "--bind=btab:up",
         # "--cycle",
-        "--select-1",
+        # "--select-1",
         "--exit-0",
         "--tiebreak=index",
         "--no-multi",
         "--height=40%",
         # '--layout=reverse',
-        # '--print-query',
+        '--print-query',
         # '--tac',
-        # '--query', query.decode()
-        "--preview-window",
-        "right:55%:wrap",
+        '--query', query.decode(),
     ]
 
     if HELP:
