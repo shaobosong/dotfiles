@@ -173,9 +173,6 @@ def get_fzf_result(query: bytes, items: List[bytes]) -> bytes:
     global do_generate_help_file_stop
     do_generate_help_file_stop = False
 
-    if not items:
-        return query
-
     # drop duplicates
     seen = set()
     items = [
