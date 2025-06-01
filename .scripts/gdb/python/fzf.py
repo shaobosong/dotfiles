@@ -196,7 +196,7 @@ def get_fzf_result(query: bytes, items: List[bytes]) -> bytes:
         "--bind=btab:up",
         # "--cycle",
         # "--select-1",
-        "--exit-0",
+        # "--exit-0",
         "--tiebreak=index",
         "--no-multi",
         "--height=40%",
