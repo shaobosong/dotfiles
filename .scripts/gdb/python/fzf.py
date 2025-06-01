@@ -77,8 +77,8 @@ def run_gdb_command(command: str) -> bytes:
 do_generate_help_file_stop = False
 
 
-def do_generate_help_file(items: List[bytes], memfd: int):
-    for i in items:
+def do_generate_help_file(query_list: List[bytes], memfd: int):
+    for i in query_list:
 
         i = i.strip()
         i = i.split(b'\n')[0].split(b'|')[0]
@@ -97,10 +97,10 @@ def do_generate_help_file(items: List[bytes], memfd: int):
             break
 
 
-def generate_help_file(items: List[bytes]) -> Tuple[int, threading.Thread]:
+def generate_help_file(query_list: List[bytes]) -> Tuple[int, threading.Thread]:
     memfd = os.memfd_create("gdb-help-file", 0)
     t = threading.Thread(target=do_generate_help_file,
-                         args=(items, memfd))
+                         args=(query_list, memfd))
     t.start()
     return memfd, t
 
@@ -168,20 +168,20 @@ def get_history_list(libreadline: ctypes.CDLL) -> List[bytes]:
     return ret
 
 
-def get_fzf_result(query: bytes, items: List[bytes]) -> bytes:
+def get_fzf_result(query: bytes, query_list: List[bytes]) -> bytes:
 
     global do_generate_help_file_stop
     do_generate_help_file_stop = False
 
     # drop duplicates
     seen = set()
-    items = [
-        s for s in (i.strip() for i in reversed(items))
+    query_list = [
+        s for s in (i.strip() for i in reversed(query_list))
         if not (s in seen or seen.add(s))
     ]
 
     if HELP:
-        help_fd, t = generate_help_file(items)
+        help_fd, t = generate_help_file(query_list)
 
     echo_str = "{..}$"
     pid = os.getpid()
@@ -212,7 +212,7 @@ def get_fzf_result(query: bytes, items: List[bytes]) -> bytes:
     p = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     assert (p.stdin)
     assert (p.stdout)
-    out = b'\x00'.join([i for i in items if i])
+    out = b'\x00'.join([i for i in query_list if i])
     p.stdin.write(out)
     p.stdin.close()
     p.wait()
