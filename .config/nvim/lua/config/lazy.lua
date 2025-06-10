@@ -39,6 +39,7 @@ require("lazy").setup({
         { import = "plugins.gitsigns" },
         { import = "plugins.ui" },
         { import = "plugins.chdir" },
+        { import = "plugins.explorer" },
         { "shaobosong/vim-line-comment" },
         { "shaobosong/vim-copy" },
         -- { "mhinz/vim-signify" },
