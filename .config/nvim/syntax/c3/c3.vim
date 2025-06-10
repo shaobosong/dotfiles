@@ -44,10 +44,11 @@ syn match c3Format display "%%" contained
 syn match c3String display "\v\"(\\.|[^\\\"])*\"" contains=c3Format
 syn match c3String display "\v`(``|.)*`"          contains=c3Format
 
-syn region c3Comment display start="\v/\*"   end="\v\*/"  contains=c3Comment,c3Todo
-syn region c3Comment display start="\v//"    end="\v$"    contains=c3Todo
-syn region c3Comment display start="\v/\*\*" end="\v\*/"  contains=c3Contract,c3Todo
-syn region c3Comment display start="\v\<\*"  end="\v\*\>" contains=c3Contract,c3Todo
+syn region c3Comment start="\v//"    end="\v$"    contains=c3Todo
+syn region c3Comment start="\v/\*"   end="\v\*/"  contains=c3Comment,c3Todo
+syn region c3Comment start="\v/\*\*" end="\v\*/"  contains=c3Contract,c3Todo
+syn region c3Comment start="\v\<\*"  end="\v\*\>" contains=c3Contract,c3Todo
+syn sync ccomment c3Comment minlines=50
 
 syn match c3Contract contained "\v<\@require>"
 syn match c3Contract contained "\v<\@ensure>"
