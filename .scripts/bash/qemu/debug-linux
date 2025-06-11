@@ -3,10 +3,12 @@
 _CURDIR=$(dirname "$(readlink -f "${0}")")
 
 QEMU=${QEMU:-qemu-system-x86_64}
-QEMU_CONFIG=${QEMU_CONFIG:-${_CURDIR}/linux.cfg}
+QEMU_CONFIG=${QEMU_CONFIG:-${_CURDIR}/debug-linux.cfg}
 
 function run() {
     qemu_cmd=(
+        "gdb"
+        "--args"
         "$QEMU"
         "-nodefaults"
         "-nographic"

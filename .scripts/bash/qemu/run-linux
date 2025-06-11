@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+_CURDIR=$(dirname "$(readlink -f "${0}")")
+
+QEMU=${QEMU:-qemu-system-x86_64}
+QEMU_CONFIG=${QEMU_CONFIG:-${_CURDIR}/run-linux.cfg}
+
+function run() {
+    qemu_cmd=(
+        "$QEMU"
+        "-nodefaults"
+        "-nographic"
+        "-readconfig $QEMU_CONFIG"
+    )
+    eval "${qemu_cmd[@]}"
+}
+
+run
