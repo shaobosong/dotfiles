@@ -34,7 +34,7 @@ require("lazy").setup({
         { import = "plugins.treesitter" },
         { import = 'plugins.cmp' },
         { import = 'plugins.fzf' },
-        { import = "plugins.lsp" },
+        { import = "plugins.code" },
         { import = "plugins.aerial" },
         { import = "plugins.gitsigns" },
         { import = "plugins.ui" },

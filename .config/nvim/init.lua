@@ -16,3 +16,5 @@ if vim.g.neovide then
 end
 -- plugin manager
 require("config.lazy")
+-- vim lsp
+require("config.lsp")
