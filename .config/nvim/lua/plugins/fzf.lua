@@ -84,6 +84,8 @@ return {
             },
             grep = {
                 fzf_opts = {
+                    ["--delimiter"] = ":",
+                    ["--nth"]  = '3..',
                     ["--history"] = fzf_history["search"],
                 },
             },
