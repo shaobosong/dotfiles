@@ -71,3 +71,6 @@ vim.opt.jumpoptions = 'stack,view'
 
 -- Operator-pending timeout
 vim.opt.timeout = false
+
+-- Disable show command in the last line of the screen
+vim.opt.showcmd = false
