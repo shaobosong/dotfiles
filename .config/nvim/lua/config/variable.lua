@@ -7,4 +7,3 @@ vim.g.maplocalleader = "\\"
 -- vim.g.loaded_netrwPlugin = 1
 
 vim.g.vim_copy_clipboard = '~/.vim-copy-clipboard'
-

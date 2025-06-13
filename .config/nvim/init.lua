@@ -12,7 +12,7 @@ require("config.keymap")
 require("config.diagnostic")
 -- configuration for neovide
 if vim.g.neovide then
-    require("config.neovide")
+  require("config.neovide")
 end
 -- plugin manager
 require("config.lazy")

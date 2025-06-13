@@ -26,10 +26,10 @@ vim.opt.scrolloff = 5
 -- Display invisible characters
 vim.opt.list = true
 vim.opt.listchars = {
-    tab = '>·',
-    trail = '▉',
-    extends = '>',
-    precedes = '<',
+  tab = '>·',
+  trail = '▉',
+  extends = '>',
+  precedes = '<',
 }
 
 -- Status line settings
@@ -60,7 +60,7 @@ vim.opt.compatible = false
 
 -- Tags file
 if vim.fn.empty(vim.fn.glob('~/.vim/tags/systags')) == 0 then
-    vim.opt.tags:append('~/.vim/tags/systags')
+  vim.opt.tags:append('~/.vim/tags/systags')
 end
 
 -- Allow hidden buffers
