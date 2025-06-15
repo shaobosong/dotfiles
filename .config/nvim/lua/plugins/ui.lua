@@ -335,8 +335,25 @@ local git = {
   },
 }
 
+local lsp = {
+  {
+    "j-hui/fidget.nvim",
+    config = function()
+      require("fidget").setup({
+        notification = {
+          window = {
+            normal_hl = "Comment",
+            winblend = 0,
+          },
+        },
+      })
+    end,
+  },
+}
+
 return {
   theme,
   focus,
   git,
+  lsp,
 }
