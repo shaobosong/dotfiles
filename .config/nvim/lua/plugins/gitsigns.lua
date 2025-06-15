@@ -1,57 +1,34 @@
 return {
   "lewis6991/gitsigns.nvim",
   config = function()
-    local gitsigns = require("gitsigns")
-    gitsigns.setup({
-      signs                        = {
-        add          = { text = '▌' },
-        change       = { text = '▌' },
-        delete       = { text = '▂' },
-        topdelete    = { text = '▀' },
-        changedelete = { text = '▐' },
+    require("gitsigns").setup({
+      signs                   = {
+        add          = { text = '┃' },
+        change       = { text = '┃' },
+        delete       = { text = '_' },
+        topdelete    = { text = '‾' },
+        changedelete = { text = '┃' },
         untracked    = { text = '┆' },
       },
-      signs_staged                 = {
-        add          = { text = '▌' },
-        change       = { text = '▌' },
-        delete       = { text = '▂' },
-        topdelete    = { text = '▀' },
-        changedelete = { text = '▐' },
+      signs_staged            = {
+        add          = { text = '┃' },
+        change       = { text = '┃' },
+        delete       = { text = '_' },
+        topdelete    = { text = '‾' },
+        changedelete = { text = '┃' },
         untracked    = { text = '┆' },
       },
-      signs_staged_enable          = true,
-      signcolumn                   = true, -- Toggle with `:Gitsigns toggle_signs`
-      numhl                        = false, -- Toggle with `:Gitsigns toggle_numhl`
-      linehl                       = false, -- Toggle with `:Gitsigns toggle_linehl`
-      word_diff                    = false, -- Toggle with `:Gitsigns toggle_word_diff`
-      watch_gitdir                 = {
-        follow_files = true
+      signcolumn              = true,
+      numhl                   = false,
+      linehl                  = false,
+      word_diff               = false,
+      attach_to_untracked     = true,
+      current_line_blame      = true,
+      current_line_blame_opts = {
+        delay = 300,
       },
-      auto_attach                  = true,
-      attach_to_untracked          = false,
-      current_line_blame           = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
-      current_line_blame_opts      = {
-        virt_text = true,
-        virt_text_pos = 'eol',         -- 'eol' | 'overlay' | 'right_align'
-        delay = 0,
-        ignore_whitespace = false,
-        virt_text_priority = 100,
-        use_focus = true,
-      },
-      current_line_blame_formatter = '<author>, <author_time:%R> - <summary>',
-      sign_priority                = 6,
-      update_debounce              = 100,
-      status_formatter             = nil, -- Use default
-      max_file_length              = 40000, -- Disable if file is longer than this (in lines)
-      preview_config               = {
-        -- Options passed to nvim_open_win
-        border = 'single',
-        style = 'minimal',
-        relative = 'cursor',
-        row = 0,
-        col = 1
-      },
-      on_attach                    = function(bufnr)
+      on_attach               = function(bufnr)
+        local gitsigns = require('gitsigns')
         local function map(mode, l, r, opts)
           opts = opts or {}
           opts.buffer = bufnr
@@ -75,49 +52,57 @@ return {
           end
         end)
 
-        -- -- Actions
-        -- map('n', '<leader>hs', gitsigns.stage_hunk)
-        -- map('n', '<leader>hr', gitsigns.reset_hunk)
-
-        -- map('v', '<leader>hs', function()
-        --     gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
-        -- end)
-
-        -- map('v', '<leader>hr', function()
-        --     gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
-        -- end)
-
-        -- map('n', '<leader>hS', gitsigns.stage_buffer)
-        -- map('n', '<leader>hR', gitsigns.reset_buffer)
-        -- map('n', '<leader>hp', gitsigns.preview_hunk)
-        -- map('n', '<leader>hi', gitsigns.preview_hunk_inline)
-
-        -- map('n', '<leader>hb', function()
-        --     gitsigns.blame_line({ full = true })
-        -- end)
-
-        -- map('n', '<leader>hd', gitsigns.diffthis)
-
-        -- map('n', '<leader>hD', function()
-        --     gitsigns.diffthis('~')
-        -- end)
-
-        -- map('n', '<leader>hQ', function() gitsigns.setqflist('all') end)
-        -- map('n', '<leader>hq', gitsigns.setqflist)
-
-        -- -- Toggles
-        -- map('n', '<leader>tb', gitsigns.toggle_current_line_blame)
-        -- map('n', '<leader>td', gitsigns.toggle_deleted)
-        -- map('n', '<leader>tw', gitsigns.toggle_word_diff)
+        -- Toggles
+        map('n', '<leader>ht', function()
+          gitsigns.toggle_linehl()
+          gitsigns.toggle_deleted()
+          gitsigns.toggle_word_diff()
+        end)
 
         -- Text object
         map({ 'o', 'x' }, 'ih', gitsigns.select_hunk)
-
-        -- Sign highlight group
-        vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = "#20D030", bg = "" })
-        vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = "#005FFF", bg = "" })
-        vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = "#F20F44", bg = "" })
       end
     })
+    -- Sign highlight group for dark theme
+    vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = "#20D030", bg = "" })
+    vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = "#005FFF", bg = "" })
+    vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = "#F20F44", bg = "" })
+    vim.api.nvim_set_hl(0, 'GitSignsChangedelete', { link = 'GitSignsChange' })
+    vim.api.nvim_set_hl(0, 'GitSignsTopdelete', { link = 'GitSignsDelete' })
+    vim.api.nvim_set_hl(0, 'GitSignsUntracked', { link = 'GitSignsAdd' })
+
+    vim.api.nvim_set_hl(0, 'GitSignsAddNr', { link = 'GitSignsAdd' })
+    vim.api.nvim_set_hl(0, 'GitSignsChangeNr', { link = 'GitSignsChange' })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteNr', { link = 'GitSignsDelete' })
+    vim.api.nvim_set_hl(0, 'GitSignsChangedeleteNr', { link = 'GitSignsChange' })
+    vim.api.nvim_set_hl(0, 'GitSignsTopdeleteNr', { link = 'GitSignsDelete' })
+    vim.api.nvim_set_hl(0, 'GitSignsUntrackedNr', { link = 'GitSignsAdd' })
+
+    vim.api.nvim_set_hl(0, 'GitSignsAddLn', { fg = "", bg = "#12261E" })
+    vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { fg = "", bg = "#121726" })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteLn', { fg = "", bg = "" })
+    vim.api.nvim_set_hl(0, 'GitSignsChangedeleteLn', { link = 'GitSignsChangeLn' })
+    vim.api.nvim_set_hl(0, 'GitSignsTopdeleteLn', { link = 'GitSignsDeleteLn' })
+    vim.api.nvim_set_hl(0, 'GitSignsUntrackedLn', { link = 'GitSignsAddLn' })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteVirtLn', { fg = "#626262", bg = "#25171C" })
+
+    vim.api.nvim_set_hl(0, 'GitSignsStagedAdd', { fg = "#0a5010", bg = "" })
+    vim.api.nvim_set_hl(0, 'GitSignsStagedChange', { fg = "#003080", bg = "" })
+    vim.api.nvim_set_hl(0, 'GitSignsStagedDelete', { fg = "#500316", bg = "" })
+    vim.api.nvim_set_hl(0, 'GitSignsStagedChangedelete', { link = 'GitSignsStagedChange' })
+    vim.api.nvim_set_hl(0, 'GitSignsStagedTopdelete', { link = 'GitSignsStagedDelete' })
+    vim.api.nvim_set_hl(0, 'GitSignsStagedUntracked', { link = 'GitSignsStagedAdd' })
+
+    vim.api.nvim_set_hl(0, 'GitSignsAddInline', { fg = "", bg = "#1D572D" })
+    vim.api.nvim_set_hl(0, 'GitSignsChangeInline', { fg = "", bg = "#1D572D" })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteInline', { fg = "", bg = "#542426" })
+
+    vim.api.nvim_set_hl(0, 'GitSignsAddLnInline', { link = 'GitSignsAddInline' })
+    vim.api.nvim_set_hl(0, 'GitSignsChangeLnInline', { link = 'GitSignsChangeInline' })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteLnInline', { link = 'GitSignsDeleteInline' })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteVirtLnInline', { fg = "#626262", bg = "#542426" })
+
+    vim.api.nvim_set_hl(0, 'GitSignsAddPreview', { fg = "", bg = "#12261E" })
+    vim.api.nvim_set_hl(0, 'GitSignsDeletePreview', { fg = "", bg = "#25171C" })
   end
 }

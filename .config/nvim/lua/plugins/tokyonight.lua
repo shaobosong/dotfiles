@@ -42,9 +42,13 @@ return {
 
         hl.ColorColumn = { bg = "#f20f44" }
 
-        hl.DiffAdd = { fg = "#FFFFFF", bg = "#005FFF" }
-        hl.DiffChange = { fg = "#FFFFFF", bg = "#AF0087" }
-        hl.DiffDelete = { fg = "#FFFFFF", bg = "#00AFAF" }
+        -- hl.DiffAdd = { fg = "", bg = "#1D421A" }
+        -- hl.DiffChange = { fg = "", bg = "#30415D" }
+        -- hl.DiffDelete = { fg = "", bg = "#421E1E" }
+
+        hl.DiffAdd = { fg = "", bg = "#12261E" }
+        hl.DiffChange = { fg = "", bg = "#121726" }
+        hl.DiffDelete = { fg = "", bg = "#25171C" }
 
         hl.WinSeparator = { bg = "", fg = "#626262" }
         hl.CursorLineNr = { bg = "#292E42", fg = "#FF9E64" }
