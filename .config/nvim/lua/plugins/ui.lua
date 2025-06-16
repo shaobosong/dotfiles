@@ -164,7 +164,7 @@ local theme = {
           hl.DiffDelete = { fg = "", bg = "#25171C" }
 
           hl.WinSeparator = { bg = "", fg = "#626262" }
-          hl.CursorLineNr = { bg = "#292E42", fg = "#FF9E64" }
+          hl.CursorLineNr = { bg = "", fg = "#FF9E64" }
           hl.LineNr = { fg = "#626262" }
           hl.LineNrAbove = { fg = "#626262" }
           hl.LineNrBelow = { fg = "#626262" }
