@@ -1,10 +1,13 @@
 syntax on
 
-highlight Comment ctermfg=darkgray
-highlight String ctermfg=darkcyan
-highlight Keyword ctermfg=darkyellow
-highlight Normal ctermfg=white
-highlight Search ctermfg=black ctermbg=darkyellow
+highlight Comment       ctermfg=darkgrey
+highlight String        ctermfg=darkcyan
+highlight Keyword       ctermfg=darkyellow
+highlight Search        ctermfg=black   ctermbg=darkyellow
+highlight LineNr        ctermfg=brown   ctermbg=NONE
+highlight LineNrAbove   ctermfg=238     ctermbg=NONE
+highlight LineNrBelow   ctermfg=238     ctermbg=NONE
+highlight Normal        ctermfg=white   ctermbg=NONE
 
 highlight default link cComment Comment
 highlight default link cString String
@@ -16,7 +19,7 @@ function! s:syntax_c()
     syntax region cComment start="/\*" end="\*/" extend fold
     syntax region cComment start="//" skip="\\$" end="$" keepend
     syntax region cString start=+L\="+ skip=+\\\\\|\\"+ end=+"+
-    syntax keyword cKeyword 
+    syntax keyword cKeyword
       \ if else
       \ switch case default
       \ while for do continue
@@ -27,7 +30,7 @@ endfunction
 function! s:syntax_c3()
     call s:syntax_c()
     syntax region cComment start="<\*" end="\*>" extend fold
-    syntax keyword cKeyword 
+    syntax keyword cKeyword
       \ module import
       \ try catch
       \ foreach foreach_r
@@ -58,6 +61,10 @@ set expandtab
 set autoindent
 set cindent
 set smartindent
+set ignorecase
+set smartcase
+set hidden
+set path+=**
 
 noremap <silent> <ESC>L <C-W>l
 noremap <silent> <ESC>H <C-W>h
