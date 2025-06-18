@@ -218,6 +218,14 @@ local focus = {
       -- ncmode = 'focus' will only fade after you activate the `:VimadeFocus` command.
       ncmode = "windows",
       fadelevel = 0.4, -- any value between 0 and 1. 0 is hidden and 1 is opaque.
+      blocklist = {
+        custom = {
+          highlights = {
+            'WinSeparator',
+            'EndOfBuffer',
+          },
+        },
+      },
     },
   },
 }
