@@ -135,9 +135,8 @@ local theme = {
           hl.Cursor = { bg = "#FFFFFF", fg = "#161616" }
           hl.Normal = { bg = "", fg = "#FFFFFF" }
           hl.NormalNC = { bg = "", fg = "#FFFFFF" }
-          hl.StatusLine = { bg = "#444444", fg = "#FFFFFF" }
-          hl.StatusLineNC = { bg = "", fg = "#FFFFFF" }
-          -- hl.StatusLineNC = { fg = "#FFFFFF" }
+          hl.StatusLine = { bg = "", fg = "#C0CAF5" }
+          hl.StatusLineNC = { bg = "", fg = "#C0CAF5" }
           hl.MsgArea = { fg = "#c0caf5" }
           hl.ModeMsg = { fg = "#c0caf5" }
           hl.Visual = { bg = "#484848" }
@@ -290,6 +289,7 @@ local git = {
           -- Toggles
           map('n', '<leader>ht', function()
             gitsigns.toggle_linehl()
+            -- topdelete issue: lewis6991/gitsigns.nvim#566
             gitsigns.toggle_deleted()
             gitsigns.toggle_word_diff()
           end)
