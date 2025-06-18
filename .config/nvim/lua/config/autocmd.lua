@@ -19,6 +19,15 @@ vim.api.nvim_create_autocmd("FileType", {
   end
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "c", "cpp" },
+  callback = function()
+    vim.opt.path:append('include')
+    vim.opt.path:append('/usr/include')
+    vim.opt.path:append('/usr/local/include')
+  end
+})
+
 -- vim.api.nvim_create_autocmd("FileType", {
 --   pattern = "qf,query",
 --   callback = function()
