@@ -44,9 +44,15 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_autocmd({ "WinLeave" }, {
   pattern = "*",
   callback = function()
-    local ft_tbl = { "aerial", "query", "qf", "netrw", "man", "lazy" }
+    local ft_tbl = { "aerial", "query", "qf", "netrw", "man", "lazy", "fzf" }
     if vim.tbl_contains(ft_tbl, vim.bo.filetype) and vim.fn.winnr("$") > 1 then
-      vim.api.nvim_win_close(vim.api.nvim_get_current_win(), false)
+      if vim.bo.filetype == "fzf" then
+        -- 'fzf-lua' doesn't work if we force to close its popup window.
+        -- TODO: pending upstream fix (like mason's process)
+        require('fzf-lua').win.hide()
+      else
+        vim.api.nvim_win_close(vim.api.nvim_get_current_win(), false)
+      end
     end
   end
 })
