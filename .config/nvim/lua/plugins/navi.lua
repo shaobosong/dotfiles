@@ -515,14 +515,15 @@ local finder = {
           },
         },
         lsp      = {
-          jump1 = false,
-          includeDeclaration = false,
+          jump1               = false,
+          includeDeclaration  = false,
           ignore_current_line = true,
-          jump1_action = fzf_actions.file_edit,
+          jump1_action        = fzf_actions.file_edit,
           -- jump1_action = actions.file_vsplit,
           -- default for others
         },
         grep     = {
+          winopts  = { preview = { layout = "vertical" } },
           fzf_opts = {
             ["--delimiter"] = ":",
             ["--nth"]       = '3..',
