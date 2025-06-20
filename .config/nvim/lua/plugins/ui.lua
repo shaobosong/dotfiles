@@ -286,6 +286,22 @@ local git = {
             end
           end)
 
+          map('n', ']C', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ ']c', bang = true })
+            else
+              gitsigns.nav_hunk('next', { target = 'staged' })
+            end
+          end)
+
+          map('n', '[C', function()
+            if vim.wo.diff then
+              vim.cmd.normal({ '[c', bang = true })
+            else
+              gitsigns.nav_hunk('prev', { target = 'staged' })
+            end
+          end)
+
           -- Actions
           map('n', '<leader>hs', gitsigns.stage_hunk)
           map('v', '<leader>hs', function()
