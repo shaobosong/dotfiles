@@ -56,7 +56,7 @@ case $# in
         ;;
 esac
 
-OBJDUMP=$(which objdump)
+OBJDUMP=$(command -v objdump)
 case $? in
     1)
         echo $"command 'objdump' not found" >&2
@@ -64,7 +64,7 @@ case $? in
         ;;
 esac
 
-XXD=$(which xxd)
+XXD=$(command -v xxd)
 case $? in
     1)
         echo $"command 'xxd' not found" >&2
