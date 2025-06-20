@@ -89,7 +89,7 @@ local completer = {
             winblend = 10,
           },
         },
-        preselect = cmp.PreselectMode.Item,
+        preselect = cmp.PreselectMode.None,
         mapping = cmp.mapping.preset.insert({
           ['<S-Up>'] = cmp.mapping.scroll_docs(-4),
           ['<S-Down>'] = cmp.mapping.scroll_docs(4),
