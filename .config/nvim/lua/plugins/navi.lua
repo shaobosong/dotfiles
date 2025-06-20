@@ -47,7 +47,7 @@ local code = {
     config = function()
       require("aerial").setup({
         backends = {
-          ['_'] = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
+          ['_'] = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
           c = { "lsp" },
         },
 
