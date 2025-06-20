@@ -180,6 +180,11 @@ local code = {
             "Struct",
             "Variable",
           },
+          lua = {
+            "Array",
+            "Object",
+            "Function",
+          },
         },
 
         -- Determines line highlighting mode when multiple splits are visible.
