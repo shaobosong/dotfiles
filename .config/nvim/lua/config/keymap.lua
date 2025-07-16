@@ -13,6 +13,8 @@ vim.keymap.set('!', '<ESC>K', '<ESC><C-W>k', opts)
 vim.keymap.set('n', 'gs', ':s@<c-r><c-w>@<c-r><c-w>@g<C-F>hhi', opts)
 vim.keymap.set('x', 'gs', ':s@@@g<C-F>hhi', opts)
 
+vim.keymap.set('', '<leader>tr', ':%s/\\s\\+$//g<CR>', opts)
+
 -- menu
 vim.cmd('anoremenu ToolBar.Go\\ to\\ definition    <Cmd>lua vim.lsp.buf.definition()<CR>')
 vim.cmd('anoremenu ToolBar.-1-                     <Nop>')
