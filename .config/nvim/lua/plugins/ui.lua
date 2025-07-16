@@ -147,7 +147,7 @@ local theme = {
           -- hl.Search = { bg = "#444444" }
 
           hl.Pmenu = { bg = "#343434", fg = "#828282" }
-          hl.PmenuSel = { bg = "#6A6A6A" }
+          hl.PmenuSel = { bg = "#6A6A6A", fg = "#FFFFFF" }
 
           hl.NormalFloat = { bg = "#343434", fg = "#c0caf5" }
           hl.FloatBorder = { fg = "#666666" }
