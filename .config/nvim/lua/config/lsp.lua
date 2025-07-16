@@ -84,6 +84,34 @@ local servers = {
       filetypes = { 'c3', 'c3i', "c3t" },
     },
   },
+  {
+    name = "pylsp",
+    bin = "pylsp",
+    config = {
+      cmd = { 'pylsp' },
+      filetypes = { 'python' },
+      root_markers = {
+        'pyproject.toml',
+        'setup.py',
+        'setup.cfg',
+        'requirements.txt',
+        'Pipfile',
+        '.git',
+      },
+      settings = {
+        pylsp = {
+          plugins = {
+            pycodestyle = {
+              enabled = false,
+            },
+            pyflakes = {
+              enabled = false,
+            },
+          },
+        },
+      },
+    },
+  },
 }
 
 for _, server in ipairs(servers) do
@@ -100,4 +128,5 @@ vim.lsp.enable({
   'clangd',
   'rust_analyzer',
   'c3_lsp',
+  'pylsp',
 })
