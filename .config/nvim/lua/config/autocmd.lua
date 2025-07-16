@@ -50,6 +50,10 @@ vim.api.nvim_create_autocmd({ "WinLeave" }, {
         -- 'fzf-lua' doesn't work if we force to close its popup window.
         -- TODO: pending upstream fix (like mason's process)
         require('fzf-lua').win.hide()
+      elseif vim.bo.filetype == "query" then
+        if vim.fn.empty(vim.fn.expand("%")) == 1 then
+          vim.api.nvim_win_close(vim.api.nvim_get_current_win(), false)
+        end
       else
         vim.api.nvim_win_close(vim.api.nvim_get_current_win(), false)
       end
