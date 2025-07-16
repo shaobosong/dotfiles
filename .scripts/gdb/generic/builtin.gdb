@@ -5,12 +5,16 @@ set confirm off
 # Download missing debug info and source files.
 # set debuginfod enabled on
 
+set max-completions unlimited
+
 # c++
 set demangle-style gnu-v3
 
 set history filename ~/.gdb_history
 # set history remove-duplicates 100
 set history save on
+
+set pagination off
 
 set print array off
 set print array-indexes on
