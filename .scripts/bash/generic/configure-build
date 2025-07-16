@@ -9,6 +9,7 @@ BUILD=${ROOT}/build
 INSTALL=${BUILD}/install
 
 TYPE=debug
+TARGET=all
 EXTRA_CONFIG_OPTS=()
 
 function panic ()
@@ -24,11 +25,16 @@ function parse_args () {
             -\? | -h | --help)
                 echo $"Usage: $PROGNAME [options] [configure options]
       --help                    Print this message
-      --type=<debug|release>    Build type (default: debug)"
+      --type=<debug|release>    Build type (default: debug)
+      --target=TARGET           Build target (default: all)"
                 exit 0
                 ;;
             --type=debug | --type=release)
                 TYPE=$optarg
+                shift
+                ;;
+            --target=*)
+                TARGET=$optarg
                 shift
                 ;;
             *)
@@ -63,8 +69,8 @@ function build () {
         "${EXTRA_CONFIG_OPTS[@]}"
     )
     eval "${configure_cmd[@]}"
-    make -C ${BUILD} -j ${JOBS}
-    make -C ${BUILD} install
+    ${MAKE_PREFIX} make ${TARGET} -C ${BUILD} -j ${JOBS}
+    ${MAKE_PREFIX} make ${TARGET} -C ${BUILD} install
 }
 
 parse_args ${@}
