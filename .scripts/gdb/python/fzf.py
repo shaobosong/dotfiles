@@ -14,13 +14,24 @@ except ImportError:
 
 # --- Configuration ---
 
+# Enable or disable longest common prefix completion
+READLINE_LONGEST_COMMON_PREFIX_COMPLETION = True
+
 # Enable or disable preview for fzf.
-PREVIEW_ENABLED = True
+FZF_PREVIEW = True
+
+# Enable or disable only list completion filed in fzf
+FZF_ONLY_LIST_COMPLETION_FIELD = True
+
+# Set help pager command
+FZF_HELP_PAGER = "less -i"
 
 # Default FZF arguments. These can be extended or overridden.
 FZF_ARGS = [
     'fzf',
     '--bind=tab:down,btab:up',
+    f'--bind=alt-h:execute(gdb --nx --batch -ex "help {{r}}"|{FZF_HELP_PAGER})',
+    '--bind=change:first',
     '--cycle',
     '--height=40%',
     '--layout=reverse',
@@ -110,7 +121,7 @@ class LibReadlineProxy:
             'rl_add_undo': (None, [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_char_p]),
             'rl_bind_keyseq': (ctypes.c_int, [ctypes.c_char_p, ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, ctypes.c_int)]),
             'rl_delete_text': (ctypes.c_int, [ctypes.c_int, ctypes.c_int]),
-            'rl_forced_update_display': (ctypes.c_int, []),
+            'rl_redraw_prompt_last_line': (None, []),
             'rl_insert_text': (ctypes.c_int, [ctypes.c_char_p]),
             # Used for ctypes memory management
             'malloc': (ctypes.c_void_p, [ctypes.c_size_t]),
@@ -174,7 +185,7 @@ class LibReadlineProxy:
 
     def forced_refresh(self):
         """Forced to update display"""
-        self.rl_forced_update_display()
+        self.rl_redraw_prompt_last_line()
 
     def bind_keyseq(self, keyseq: bytes, func: RL_COMMAND_FUNC) -> int:
         """Binds a key sequence to a readline function."""
@@ -250,14 +261,22 @@ def command_generator(libreadline: LibReadlineProxy) -> Iterator[bytes]:
     except gdb.error as e:
         raise RuntimeError(f"Failed to retrieve GDB commands: {e}")
 
-def completion_generator(matches_ptr: ctypes.POINTER(ctypes.c_char_p)) -> Iterator[bytes]:
-    seen = set()
+def completion_generator(text: bytes, start: int, end: int, matches_ptr: ctypes.POINTER(ctypes.c_char_p)) -> Iterator[bytes]:
+    end = text.find(b' ', end)
+    if end == -1:
+        end = len(text)
+
+    unique_matches = set()
     for m in matches_ptr:
         if m is None:
             break
-        if m != b'' and m not in seen:
-            seen.add(m)
-            yield m
+        if m != b'':
+            unique_matches.add(m)
+
+    sorted_unique_matches = sorted(list(unique_matches))
+
+    for m in sorted_unique_matches:
+        yield text[0:start] + m + text[end:]
 
 # --- FZF Interaction ---
 
@@ -277,7 +296,7 @@ def get_fzf_result(extra_fzf_args: List[str], choices_generator: Iterator[bytes]
     fzf_args.extend(extra_fzf_args)
     fzf_args.extend(['--query', query.decode('utf-8', 'replace')])
 
-    if PREVIEW_ENABLED:
+    if FZF_PREVIEW:
         # Add a preview window showing GDB's help for the selected command
         fzf_args.extend([
             '--preview',
@@ -333,7 +352,9 @@ def fzf_search_history_callback(count: int, key: int) -> int:
         query = libreadline.get_text()
         selected = get_fzf_result([], history_generator(libreadline), query)
 
-        libreadline.update_text(selected)
+        if selected != b'':
+            libreadline.update_text(selected)
+
         libreadline.forced_refresh()
     except Exception as e:
         print(f"\ngdb-fzf: Failed to search history: {e}")
@@ -350,7 +371,9 @@ def fzf_search_command_callback(count: int, key: int) -> int:
         query = libreadline.get_text()
         selected = get_fzf_result([], command_generator(libreadline), query)
 
-        libreadline.update_text(selected)
+        if selected != b'':
+            libreadline.update_text(selected)
+
         libreadline.forced_refresh()
     except Exception as e:
         print(f"\ngdb-fzf: Failed to search command: {e}")
@@ -373,7 +396,6 @@ def fzf_attempted_completion_callback(text: bytes, start: int, end: int) -> int:
 
         matches_ptr = ctypes.cast(matches, ctypes.POINTER(ctypes.c_char_p))
 
-        common_prefix = matches_ptr[0]
         for i, b in enumerate(matches_ptr):
             if b is None:
                 break
@@ -382,14 +404,35 @@ def fzf_attempted_completion_callback(text: bytes, start: int, end: int) -> int:
         if i == 1:
             return matches
 
-        # Return early to let the original completion system finish completing
-        # the rest of the common prefix that hasn't been fully completed yet
-        if text != b'' and text != common_prefix:
-            return matches
+        # Return early to let the original completer finish completing the
+        # rest of the common prefix that hasn't been fully completed yet
+        if READLINE_LONGEST_COMMON_PREFIX_COMPLETION:
+            common_prefix = matches_ptr[0]
+            if text != common_prefix:
+                return matches
 
         # Now FZF takes over and handles the matches
-        prompt = libreadline.rl_line_buffer.value.decode('utf-8')
-        selected = get_fzf_result([f'--prompt={prompt}> '], completion_generator(matches_ptr), b'')
+
+        # Ignore first match
+        matches1 = matches + ctypes.sizeof(ctypes.c_char_p)
+        matches_ptr = ctypes.cast(matches1, ctypes.POINTER(ctypes.c_char_p))
+
+        # Get the line text in line editor
+        line_text = libreadline.get_text()
+
+        # Get index of the field under completion in the space-separated string
+        nth = line_text[0:start].count(b' ') + 1
+
+        # Run FZF
+        extra_fzf_args = [
+            '--delimiter= ',
+            f'--accept-nth={nth}',
+        ]
+        if FZF_ONLY_LIST_COMPLETION_FIELD:
+            extra_fzf_args.append(f'--with-nth={nth}')
+
+        selected = get_fzf_result(extra_fzf_args, completion_generator(line_text, start, end, matches_ptr), text)
+
         libreadline.forced_refresh()
         libreadline.py_rl_free_match_list(matches)
 
