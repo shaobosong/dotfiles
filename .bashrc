@@ -119,11 +119,12 @@ alias 2dec='printf %d\\n'
 
 alias lg='\lazygit'
 alias curls5='\curl -x socks5h://$(\awk '\''$2 == "00000000" {print strtonum("0x" substr($3,7,2)) "." strtonum("0x" substr($3,5,2)) "." strtonum("0x" substr($3,3,2)) "." strtonum("0x" substr($3,1,2))}'\'' /proc/net/route):2208'
+alias nf='fzf --bind "enter:become(nvim {})" --bind "alt-J:jump,jump:become(nvim {})"'
 
 # exports
 export EDITOR=/usr/bin/nano
 export PROMPT_COMMAND="history -a; #history -n"
-export FZF_DEFAULT_OPTS="--bind=alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word"
+export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first --cycle"
 export DELTA_FEATURES='+side-by-side'
 export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
 export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
