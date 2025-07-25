@@ -112,6 +112,16 @@ local servers = {
       },
     },
   },
+  {
+    name = "zls",
+    bin = "zls",
+    config = {
+      cmd = { 'zls' },
+      filetypes = { 'zig', 'zir' },
+      root_markers = { 'zls.json', 'build.zig', '.git' },
+      workspace_required = false,
+    },
+  },
 }
 
 for _, server in ipairs(servers) do
@@ -129,4 +139,5 @@ vim.lsp.enable({
   'rust_analyzer',
   'c3_lsp',
   'pylsp',
+  'zls'
 })
