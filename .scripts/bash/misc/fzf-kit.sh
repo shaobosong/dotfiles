@@ -11,8 +11,8 @@ FZF_CMD="fzf --bind=change:first"
 
 _check_commands() {
     if command -v fd &> /dev/null; then
-        FIND_FILES_CMD="fd -t f"
-        FIND_DIRS_CMD="fd -t d"
+        FIND_FILES_CMD="fd -t f -H"
+        FIND_DIRS_CMD="fd -t d -H"
     elif command -v find &> /dev/null; then
         FIND_FILES_CMD="find . -type f"
         FIND_DIRS_CMD="find . -mindepth 1 -type d"
