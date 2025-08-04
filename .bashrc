@@ -142,3 +142,6 @@ fi
 if test -f /usr/share/fzf/key-bindings.bash; then
     source /usr/share/fzf/key-bindings.bash
 fi
+if test -f ~/.bashrc_extra; then
+    source ~/.bashrc_extra
+fi
