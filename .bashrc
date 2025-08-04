@@ -112,6 +112,7 @@ fi
 
 # aliases
 alias ci="source ${_scripts}/misc/cd-index.sh"
+alias fk="${_scripts}/misc/fzf-kit.sh"
 
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
@@ -119,8 +120,6 @@ alias 2dec='printf %d\\n'
 
 alias lg='\lazygit'
 alias curls5='\curl -x socks5h://$(\awk '\''$2 == "00000000" {print strtonum("0x" substr($3,7,2)) "." strtonum("0x" substr($3,5,2)) "." strtonum("0x" substr($3,3,2)) "." strtonum("0x" substr($3,1,2))}'\'' /proc/net/route):2208'
-alias nf='fzf --bind "enter:become(nvim {})" --bind "alt-J:jump,jump:become(nvim {})" --bind "ctrl-v:execute(nvim -R {})"'
-alias ng='\grep -rRnI "" | fzf --delimiter=: --nth=3 --tiebreak=index --bind "enter:become(nvim {1} +{2})" --bind "ctrl-v:execute(nvim -R {1} +{2})"'
 
 # exports
 export EDITOR=/usr/bin/nano
