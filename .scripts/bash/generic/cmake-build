@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+JOBS=`nproc`
+PROGNAME=$(basename $0)
+ROOT=$PWD
+SRC=${ROOT}
+BUILD=${ROOT}/build
+INSTALL=${BUILD}/install
+
+TYPE=debug
+TARGET=all
+EXTRA_CONFIG_OPTS=()
+
+function panic ()
+{
+    1>&2 echo "Error: $@"
+    exit 1
+}
+
+function parse_args () {
+    while test $# -gt 0; do
+        optarg="${1#*=}"
+        case $1 in
+            -\? | -h | --help)
+                echo $"Usage: $PROGNAME [options] [configure options]
+      --help                    Print this message
+      --type=<debug|release>    Build type (default: debug)
+      --target=TARGET           Build target (default: all)"
+                exit 0
+                ;;
+            --type=debug | --type=release)
+                TYPE=$optarg
+                shift
+                ;;
+            --target=*)
+                TARGET=$optarg
+                shift
+                ;;
+            *)
+                EXTRA_CONFIG_OPTS+=(
+                    "${1}"
+                )
+                shift
+                ;;
+        esac
+    done
+
+    # build type
+    if test "${TYPE}" = "debug"; then
+        EXTRA_CONFIG_OPTS+=(
+            "-DCMAKE_BUILD_TYPE=Debug"
+            '-DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -g3 -O0 -Wall"'
+            '-DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -g3 -O0 -Wall"'
+        )
+    elif test "${TYPE}" = "release"; then
+        EXTRA_CONFIG_OPTS+=(
+            "-DCMAKE_BUILD_TYPE=Release"
+        )
+    fi
+}
+
+function build_init () {
+    rm -rvf ${BUILD}
+    mkdir -pv ${BUILD}
+    cd ${BUILD}
+}
+
+function build () {
+    configure_cmd=(
+        "cmake"
+        "-S ${SRC}"
+        "-B ${BUILD}"
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        "-DCMAKE_VERBOSE_MAKEFILE=ON"
+        "-DCMAKE_INSTALL_PREFIX=${INSTALL}"
+        "${EXTRA_CONFIG_OPTS[@]}"
+        "${SRC}"
+    )
+    eval "${configure_cmd[@]}"
+    make ${TARGET} -C ${BUILD} -j ${JOBS}
+    make ${TARGET} -C ${BUILD} install
+}
+
+parse_args ${@}
+build_init
+build
