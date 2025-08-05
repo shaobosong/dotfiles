@@ -57,6 +57,8 @@ function parse_args () {
     elif test "${TYPE}" = "release"; then
         EXTRA_CONFIG_OPTS+=(
             "-DCMAKE_BUILD_TYPE=Release"
+            '-DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -O2 -Wall"'
+            '-DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -O2 -Wall"'
         )
     fi
 }
