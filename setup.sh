@@ -29,6 +29,7 @@ backup() {
 # version 0.2
 set -- \
     ".bashrc" \
+    ".config/alacritty" \
     ".config/fd" \
     ".config/nvim" \
     ".config/ripgrep" \
