@@ -51,16 +51,16 @@ _check_commands() {
     fi
 }
 
-_fzf_files_action() {
+_fzf_file_vim_action() {
     ${FIND_FILES_CMD} | ${FZF_CMD} \
-        --prompt="Files > " \
+        --prompt="File > " \
         --preview "${CAT_CMD} {}" \
         --bind "enter:become(${VIM_CMD} {})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {})"
 }
 
-_fzf_grep_action() {
+_fzf_grep_vim_action() {
     FZF_DEFAULT_COMMAND="$GREP_CMD ''" ${FZF_CMD} \
         --ansi \
         --delimiter=: \
@@ -78,15 +78,26 @@ fzf_kit() {
 
     declare -A fzf_actions
     fzf_actions=(
-        ["📁 files"]="_fzf_files_action"
-        ["🔍 grep"]="_fzf_grep_action"
+        ["file_vim"]="_fzf_file_vim_action"
+        ["grep_vim"]="_fzf_grep_vim_action"
     )
+
+    if test -f /usr/share/fzf/key-bindings.bash; then
+        source /usr/share/fzf/key-bindings.bash
+        fzf_actions+=(
+            ["file"]="fzf-file-widget"
+            ["history"]="__fzf_history__"
+        )
+    fi
 
     local options
     options=$(printf "%s\n" "${!fzf_actions[@]}" | sort)
 
     local choice
     choice=$(echo -e "$options" | ${FZF_CMD} \
+        --layout=reverse \
+        --height=~50% \
+        --tmux center,50% \
         --cycle \
         --prompt="Actions > ")
 
@@ -96,4 +107,11 @@ fzf_kit() {
     fi
 }
 
-fzf_kit "$@"
+if (( BASH_VERSINFO[0] < 4 )); then
+    # TODO: Compatible with lower 'bash' version
+    false
+else
+    bind -m emacs-standard -x '"\ej": fzf_kit'
+    bind -m vi-command -x '"\ej": fzf_kit'
+    bind -m vi-insert -x '"\ej": fzf_kit'
+fi

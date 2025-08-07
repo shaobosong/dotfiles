@@ -112,7 +112,6 @@ fi
 
 # aliases
 alias ci="source ${_scripts}/misc/cd-index.sh"
-alias fk="${_scripts}/misc/fzf-kit.sh"
 
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
@@ -124,7 +123,7 @@ alias curls5='\curl -x socks5h://$(\awk '\''$2 == "00000000" {print strtonum("0x
 # exports
 export EDITOR=/usr/bin/nano
 export PROMPT_COMMAND="history -a; #history -n"
-export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first"
+export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first,alt-enter:accept"
 export DELTA_FEATURES='+side-by-side'
 export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
 export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
@@ -141,6 +140,9 @@ if test -f /usr/share/fzf/completion.bash; then
 fi
 if test -f /usr/share/fzf/key-bindings.bash; then
     source /usr/share/fzf/key-bindings.bash
+fi
+if test -f ${_scripts}/misc/fzf-kit.sh; then
+    source ${_scripts}/misc/fzf-kit.sh
 fi
 if test -f ~/.bashrc_extra; then
     source ~/.bashrc_extra
