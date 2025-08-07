@@ -1,0 +1,66 @@
+[general]
+# working_directory = ""
+
+[window]
+decorations = "Full"
+decorations_theme_variant = "Dark"
+dimensions = { columns = 120, lines = 30 }
+padding = { x = 5, y = 5 }
+dynamic_padding = true
+opacity = 0.93
+
+[font]
+normal = { family = "Cascadia Mono", style = "Regular" }
+
+[terminal]
+# shell = ""
+
+# [selection]
+# save_to_clipboard = true
+
+# [mouse]
+# bindings = [
+#   { mouse = "Right", action = "Paste" },
+# ]
+
+[keyboard]
+bindings = [
+    { key = "N",         mods = "Control|Shift", action = "CreateNewWindow" },
+    { key = "Slash",     mods = "Control",       chars = "\u001f" },
+    { key = "Semicolon", mods = "Control",       chars = "\u003b" },
+# Need to bind `key` by `scancode` with `alt+ctrl` keys on Windows.
+    { key = 35,          mods = "Control|Alt",   chars = "\u001b\u0008" },
+]
+
+# Theme: Campbell (Windows 10 default)
+
+# Default colors
+[colors.primary]
+background = '#0c0c0c'
+foreground = '#cccccc'
+
+# Normal colors
+
+[colors.normal]
+black      = '#0c0c0c'
+red        = '#c50f1f'
+green      = '#13a10e'
+
+yellow     = '#c19c00'
+blue       = '#3b78ff'
+# blue       = '#0037da'
+magenta    = '#881798'
+cyan       = '#3a96dd'
+white      = '#cccccc'
+
+# Bright colors
+[colors.bright]
+
+black      = '#767676'
+red        = '#e74856'
+green      = '#16c60c'
+yellow     = '#f9f1a5'
+blue       = '#3b78ff'
+magenta    = '#b4009e'
+cyan       = '#61d6d6'
+white      = '#f2f2f2'
