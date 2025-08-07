@@ -28,6 +28,7 @@ bindings = [
     { key = "N",         mods = "Control|Shift", action = "CreateNewWindow" },
     { key = "Slash",     mods = "Control",       chars = "\u001f" },
     { key = "Semicolon", mods = "Control",       chars = "\u003b" },
+    { key = "Enter",     mods = "Alt",           chars = "\u001b\u000d" },
 # Need to bind `key` by `scancode` with `alt+ctrl` keys on Windows.
     { key = 35,          mods = "Control|Alt",   chars = "\u001b\u0008" },
 ]
