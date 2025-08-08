@@ -9,6 +9,7 @@ SRC=${ROOT}
 BUILD=${ROOT}/build
 INSTALL=${BUILD}/install
 
+PLATFORM=linux
 TYPE=debug
 TARGET=all
 EXTRA_CONFIG_OPTS=()
@@ -25,10 +26,15 @@ function parse_args () {
         case $1 in
             -\? | -h | --help)
                 echo $"Usage: $PROGNAME [options] [configure options]
-      --help                    Print this message
-      --type=<debug|release>    Build type (default: debug)
-      --target=TARGET           Build target (default: all)"
+      --help                     Print this message
+      --platform=<linux|mingw64> Build platform (default: linux)
+      --type=<debug|release>     Build type (default: debug)
+      --target=TARGET            Build target (default: all)"
                 exit 0
+                ;;
+            --platform=linux | --platform=mingw64)
+                PLATFORM=$optarg
+                shift
                 ;;
             --type=debug | --type=release)
                 TYPE=$optarg
@@ -60,6 +66,27 @@ function parse_args () {
             '-DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -O2 -Wall"'
             '-DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -O2 -Wall"'
         )
+    else
+        echo "Failed to find build type: '${TYPE}'" >&2
+        exit 1
+    fi
+
+    # build platform
+    if test "${PLATFROM}" = "linux"; then
+        true
+    elif test "${PLATFORM}" = "mingw64"; then
+        EXTRA_CONFIG_OPTS+=(
+            "-DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc"
+            "-DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++"
+            "-DCMAKE_SYSTEM_NAME=Windows"
+            "-DCMAKE_FIND_ROOT_PATH='/usr/x86_64-w64-mingw32;${INSTALL}'"
+            "-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER"
+            "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY"
+            "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY"
+        )
+    else
+        echo "Failed to find build platform: '${PLATFORM}'" >&2
+        exit 1
     fi
 }
 
