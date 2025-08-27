@@ -72,7 +72,7 @@ function parse_args () {
     fi
 
     # build platform
-    if test "${PLATFROM}" = "linux"; then
+    if test "${PLATFORM}" = "linux"; then
         true
     elif test "${PLATFORM}" = "mingw64"; then
         EXTRA_CONFIG_OPTS+=(
