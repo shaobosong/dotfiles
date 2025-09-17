@@ -82,16 +82,17 @@ function build_init () {
 
 function build () {
     setup_cmd=(
-        "/usr/bin/meson"
+        "meson"
         "setup"
         "--prefix=${INSTALL}"
+        "--default-library both"
         "${EXTRA_CONFIG_OPTS[@]}"
         "$BUILD"
         "$SOURCE"
     )
     eval "${setup_cmd[@]}"
     compile_cmd=(
-        "/usr/bin/meson"
+        "meson"
         "compile"
         "-C"
         "${BUILD}"
@@ -99,20 +100,20 @@ function build () {
         "${JOBS}"
     )
     eval "${compile_cmd[@]}"
-    test_cmd=(
-        "/usr/bin/meson"
-        "test"
-        "-C"
-        "${BUILD}"
-    )
-    eval "${test_cmd[@]}"
     install_cmd=(
-        "/usr/bin/meson"
+        "meson"
         "install"
         "-C"
         "${BUILD}"
     )
     eval "${install_cmd[@]}"
+    test_cmd=(
+        "meson"
+        "test"
+        "-C"
+        "${BUILD}"
+    )
+    eval "${test_cmd[@]}"
 }
 
 parse_args ${@}
