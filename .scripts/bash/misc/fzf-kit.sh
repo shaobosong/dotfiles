@@ -65,12 +65,14 @@ _fzf_grep_vim_action() {
         --ansi \
         --delimiter=: \
         --nth=3.. \
-        --prompt="Grep > " \
+        --prompt="Grep [] > " \
         --preview "${CAT_CMD} {1} ${CAT_CMD_EXTRA} {2}" \
         --preview-window 'up,50%,border-down,+{2}/2' \
         --bind "enter:become(${VIM_CMD} {1} +{2})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {1} +{2})" \
-        --bind "ctrl-v:execute(${VIM_CMD} -R {1} +{2})"
+        --bind "ctrl-v:execute(${VIM_CMD} -R {1} +{2})" \
+        --bind "alt-i:reload(${GREP_CMD} --no-ignore --hidden '')+change-prompt(Grep [i] > )" \
+        --bind "alt-r:reload(${GREP_CMD} '')+change-prompt(Grep [] > )"
 }
 
 fzf_kit() {
@@ -90,20 +92,17 @@ fzf_kit() {
         )
     fi
 
-    local options
-    options=$(printf "%s\n" "${!fzf_actions[@]}" | sort)
+    __options=$(printf "%s\n" "${!fzf_actions[@]}" | sort)
 
-    local choice
-    choice=$(echo -e "$options" | ${FZF_CMD} \
+    __choice=$(echo -e "$__options" | ${FZF_CMD} \
         --layout=reverse \
         --height=~50% \
         --tmux center,50% \
         --cycle \
         --prompt="Actions > ")
 
-    if [[ -n "$choice" ]]; then
-        local func_to_run="${fzf_actions[$choice]}"
-        "$func_to_run"
+    if [[ -n "$__choice" ]]; then
+        "${fzf_actions[$__choice]}"
     fi
 }
 
