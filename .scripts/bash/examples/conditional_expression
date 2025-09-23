@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -u
+a=1*
+[[ ${a} == 123 ]] && echo "Not here" || echo "Here"
+# == 的右侧如果是变量且包含通配符，会触发模式匹配
+[[ 123 == ${a} ]] && echo "Here" || echo "Not here"
+[[ "${a}" == 123 ]] && echo "Not here" || echo "Here"
+[[ 123 == "${a}" ]] && echo "Not here" || echo "Here"
