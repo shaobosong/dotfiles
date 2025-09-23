@@ -3,9 +3,11 @@
 FIND_FILES_CMD= # fd
 FIND_DIRS_CMD= # fd
 GREP_CMD= # rg
+GREP_HIDDEN_OPT=
+GREP_IGNORE_OPT=
 VIM_CMD= # nvim
 CAT_CMD= # bat
-CAT_CMD_EXTRA=
+CAT_HIGHLIGHT_LINE_OPT=
 
 FZF_CMD="fzf --bind=change:first"
 
@@ -23,8 +25,12 @@ _check_commands() {
 
     if command -v rg &> /dev/null; then
         GREP_CMD="rg --line-number --no-heading --color=always --follow"
+        GREP_HIDDEN_OPT="--hidden"
+        GREP_IGNORE_OPT="--no-ignore"
     elif command -v grep &> /dev/null; then
         GREP_CMD="grep -rnRI --color=always"
+        GREP_HIDDEN_OPT=""
+        GREP_IGNORE_OPT=""
     else
         echo "Error: Failed to find 'rg' or 'grep'" >&2
         exit 1
@@ -41,10 +47,10 @@ _check_commands() {
 
     if command -v bat &> /dev/null; then
         CAT_CMD="bat -n --decorations=always --color=never"
-        CAT_CMD_EXTRA="--highlight-line"
+        CAT_HIGHLIGHT_LINE_OPT="--highlight-line"
     elif command -v cat &> /dev/null; then
         CAT_CMD="cat -n"
-        CAT_CMD_EXTRA="||: "
+        CAT_HIGHLIGHT_LINE_OPT="||:"
     else
         echo "Error: Failed to find 'bat' or 'cat'" >&2
         exit 1
@@ -53,7 +59,7 @@ _check_commands() {
 
 _fzf_file_vim_action() {
     ${FIND_FILES_CMD} | ${FZF_CMD} \
-        --prompt="File > " \
+        --prompt="File> " \
         --preview "${CAT_CMD} {}" \
         --bind "enter:become(${VIM_CMD} {})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {})" \
@@ -61,18 +67,37 @@ _fzf_file_vim_action() {
 }
 
 _fzf_grep_vim_action() {
+    # Note: exclusive
+    __flag_hidden="(+hidden)"
+    __flag_ignore="(+ignore)"
+
     FZF_DEFAULT_COMMAND="$GREP_CMD ''" ${FZF_CMD} \
         --ansi \
         --delimiter=: \
         --nth=3.. \
-        --prompt="Grep [] > " \
-        --preview "${CAT_CMD} {1} ${CAT_CMD_EXTRA} {2}" \
+        --prompt="Grep> " \
+        --header="<ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
+        --preview "${CAT_CMD} {1} ${CAT_HIGHLIGHT_LINE_OPT} {2}" \
         --preview-window 'up,50%,border-down,+{2}/2' \
         --bind "enter:become(${VIM_CMD} {1} +{2})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {1} +{2})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {1} +{2})" \
-        --bind "alt-i:reload(${GREP_CMD} --no-ignore --hidden '')+change-prompt(Grep [i] > )" \
-        --bind "alt-r:reload(${GREP_CMD} '')+change-prompt(Grep [] > )"
+        --bind "alt-h:transform:
+            [[ \"\${FZF_PROMPT}\" == *\"${__flag_hidden}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${__flag_hidden}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${__flag_hidden}\">}
+            final_opts=\"\"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\" ${GREP_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\" ${GREP_IGNORE_OPT}\"
+            echo \"change-prompt(\${new_prompt})+reload:${GREP_CMD} \${final_opts} ''\"" \
+        --bind "alt-i:transform:
+            [[ \"\${FZF_PROMPT}\" == *\"${__flag_ignore}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${__flag_ignore}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${__flag_ignore}\">}
+            final_opts=\"\"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\" ${GREP_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\" ${GREP_IGNORE_OPT}\"
+            echo \"change-prompt(\${new_prompt})+reload:${GREP_CMD} \${final_opts} ''\""
 }
 
 fzf_kit() {
