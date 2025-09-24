@@ -24,11 +24,11 @@ _check_commands() {
     fi
 
     if command -v rg &> /dev/null; then
-        GREP_CMD="rg --line-number --no-heading --color=always --follow --no-config"
+        GREP_CMD="rg --line-number --color=always --no-heading --follow --no-binary --no-config"
         GREP_HIDDEN_OPT="--hidden"
         GREP_IGNORE_OPT="--no-ignore"
     elif command -v grep &> /dev/null; then
-        GREP_CMD="grep -rnRI --color=always"
+        GREP_CMD="grep --line-number --color=always --dereference-recursive --binary-files=without-match"
         GREP_HIDDEN_OPT=""
         GREP_IGNORE_OPT=""
     else
@@ -88,16 +88,16 @@ _fzf_grep_vim_action() {
                 new_prompt=\${FZF_PROMPT/\"${__flag_hidden}\"/} ||
                 new_prompt=\${FZF_PROMPT/>/\"${__flag_hidden}\">}
             final_opts=\"\"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\" ${GREP_IGNORE_OPT}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\" ${GREP_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\"${GREP_IGNORE_OPT} \"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\"${GREP_HIDDEN_OPT} \"
             echo \"change-prompt(\${new_prompt})+change-header(${GREP_CMD} \${final_opts})+reload:${GREP_CMD} \${final_opts} ''\"" \
         --bind "alt-i:transform:
             [[ \"\${FZF_PROMPT}\" == *\"${__flag_ignore}\"* ]] &&
                 new_prompt=\${FZF_PROMPT/\"${__flag_ignore}\"/} ||
                 new_prompt=\${FZF_PROMPT/>/\"${__flag_ignore}\">}
             final_opts=\"\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\" ${GREP_HIDDEN_OPT}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\" ${GREP_IGNORE_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\"${GREP_HIDDEN_OPT} \"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\"${GREP_IGNORE_OPT} \"
             echo \"change-prompt(\${new_prompt})+change-header(${GREP_CMD} \${final_opts})+reload:${GREP_CMD} \${final_opts} ''\""
 }
 
