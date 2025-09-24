@@ -130,8 +130,8 @@ fzf_kit() {
 
     declare -A fzf_actions
     fzf_actions=(
-        ["file_vim"]="_fzf_file_vim_action"
-        ["grep_vim"]="_fzf_grep_vim_action"
+        ["file-vim"]="_fzf_file_vim_action"
+        ["grep-vim"]="_fzf_grep_vim_action"
     )
 
     if test -f /usr/share/fzf/key-bindings.bash; then
