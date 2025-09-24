@@ -26,7 +26,6 @@ _check_commands() {
         FIND_IGNORE_OPT=""
     else
         echo "Error: Failed to find 'fd' or 'find'" >&2
-        exit 1
     fi
 
     if command -v rg &> /dev/null; then
@@ -39,7 +38,6 @@ _check_commands() {
         GREP_IGNORE_OPT=""
     else
         echo "Error: Failed to find 'rg' or 'grep'" >&2
-        exit 1
     fi
 
     if command -v nvim &> /dev/null; then
@@ -48,7 +46,6 @@ _check_commands() {
         VIM_CMD="vim"
     else
         echo "Error: Failed to find 'neovim' or 'vim'" >&2
-        exit 1
     fi
 
     if command -v bat &> /dev/null; then
@@ -59,7 +56,6 @@ _check_commands() {
         CAT_HIGHLIGHT_LINE_OPT="||:"
     else
         echo "Error: Failed to find 'bat' or 'cat'" >&2
-        exit 1
     fi
 }
 
