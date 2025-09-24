@@ -115,18 +115,18 @@ _fzf_grep_vim_action() {
             [[ \"\${FZF_PROMPT}\" == *\"${__flag_hidden}\"* ]] &&
                 new_prompt=\${FZF_PROMPT/\"${__flag_hidden}\"/} ||
                 new_prompt=\${FZF_PROMPT/>/\"${__flag_hidden}\">}
-            final_opts=\"\"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\"${GREP_IGNORE_OPT} \"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\"${GREP_HIDDEN_OPT} \"
-            echo \"change-prompt(\${new_prompt})+change-header(${GREP_CMD} \${final_opts})+reload:${GREP_CMD} \${final_opts} ''\"" \
+            new_cmd=\"${GREP_CMD}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${GREP_IGNORE_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${GREP_HIDDEN_OPT}\"
+            echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd ''\"" \
         --bind "alt-i:transform:
             [[ \"\${FZF_PROMPT}\" == *\"${__flag_ignore}\"* ]] &&
                 new_prompt=\${FZF_PROMPT/\"${__flag_ignore}\"/} ||
                 new_prompt=\${FZF_PROMPT/>/\"${__flag_ignore}\">}
-            final_opts=\"\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\"${GREP_HIDDEN_OPT} \"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\"${GREP_IGNORE_OPT} \"
-            echo \"change-prompt(\${new_prompt})+change-header(${GREP_CMD} \${final_opts})+reload:${GREP_CMD} \${final_opts} ''\""
+            new_cmd=\"${GREP_CMD}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${GREP_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${GREP_IGNORE_OPT}\"
+            echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd ''\""
 }
 
 fzf_kit() {
