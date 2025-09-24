@@ -24,7 +24,7 @@ _check_commands() {
     fi
 
     if command -v rg &> /dev/null; then
-        GREP_CMD="rg --line-number --no-heading --color=always --follow"
+        GREP_CMD="rg --line-number --no-heading --color=always --follow --no-config"
         GREP_HIDDEN_OPT="--hidden"
         GREP_IGNORE_OPT="--no-ignore"
     elif command -v grep &> /dev/null; then
