@@ -2,6 +2,8 @@
 
 FIND_FILES_CMD= # fd
 FIND_DIRS_CMD= # fd
+FIND_HIDDEN_OPT=
+FIND_IGNORE_OPT=
 GREP_CMD= # rg
 GREP_HIDDEN_OPT=
 GREP_IGNORE_OPT=
@@ -13,11 +15,15 @@ FZF_CMD="fzf --bind=change:first"
 
 _check_commands() {
     if command -v fd &> /dev/null; then
-        FIND_FILES_CMD="fd -t f -H"
-        FIND_DIRS_CMD="fd -t d -H"
+        FIND_FILES_CMD="fd --type file"
+        FIND_DIRS_CMD="fd --type directory"
+        FIND_HIDDEN_OPT="--hidden"
+        FIND_IGNORE_OPT="--no-ignore"
     elif command -v find &> /dev/null; then
         FIND_FILES_CMD="find . -type f"
         FIND_DIRS_CMD="find . -mindepth 1 -type d"
+        FIND_HIDDEN_OPT=""
+        FIND_IGNORE_OPT=""
     else
         echo "Error: Failed to find 'fd' or 'find'" >&2
         exit 1
@@ -58,12 +64,34 @@ _check_commands() {
 }
 
 _fzf_file_vim_action() {
+    export FD_CONFIG_PATH=
+    __flag_hidden="(+hidden)"
+    __flag_ignore="(+ignore)"
+
     ${FIND_FILES_CMD} | ${FZF_CMD} \
+        --ghost="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
+        --header="${FIND_FILES_CMD}" \
         --prompt="File> " \
         --preview "${CAT_CMD} {}" \
         --bind "enter:become(${VIM_CMD} {})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {})" \
-        --bind "ctrl-v:execute(${VIM_CMD} -R {})"
+        --bind "ctrl-v:execute(${VIM_CMD} -R {})" \
+        --bind "alt-h:transform:
+            [[ \"\${FZF_PROMPT}\" == *\"${__flag_hidden}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${__flag_hidden}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${__flag_hidden}\">}
+            new_cmd=\"${FIND_FILES_CMD}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${FIND_IGNORE_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${FIND_HIDDEN_OPT}\"
+            echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd\"" \
+        --bind "alt-i:transform:
+            [[ \"\${FZF_PROMPT}\" == *\"${__flag_ignore}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${__flag_ignore}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${__flag_ignore}\">}
+            new_cmd=\"${FIND_FILES_CMD}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${FIND_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${FIND_IGNORE_OPT}\"
+            echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd\""
 }
 
 _fzf_grep_vim_action() {
