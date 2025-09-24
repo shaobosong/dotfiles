@@ -71,12 +71,13 @@ _fzf_grep_vim_action() {
     __flag_hidden="(+hidden)"
     __flag_ignore="(+ignore)"
 
-    FZF_DEFAULT_COMMAND="$GREP_CMD ''" ${FZF_CMD} \
+    FZF_DEFAULT_COMMAND="${GREP_CMD} ''" ${FZF_CMD} \
         --ansi \
         --delimiter=: \
         --nth=3.. \
         --prompt="Grep> " \
-        --header="<ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
+        --header="${GREP_CMD}" \
+        --ghost="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
         --preview "${CAT_CMD} {1} ${CAT_HIGHLIGHT_LINE_OPT} {2}" \
         --preview-window 'up,50%,border-down,+{2}/2' \
         --bind "enter:become(${VIM_CMD} {1} +{2})" \
@@ -87,9 +88,9 @@ _fzf_grep_vim_action() {
                 new_prompt=\${FZF_PROMPT/\"${__flag_hidden}\"/} ||
                 new_prompt=\${FZF_PROMPT/>/\"${__flag_hidden}\">}
             final_opts=\"\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\" ${GREP_HIDDEN_OPT}\"
             [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\" ${GREP_IGNORE_OPT}\"
-            echo \"change-prompt(\${new_prompt})+reload:${GREP_CMD} \${final_opts} ''\"" \
+            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\" ${GREP_HIDDEN_OPT}\"
+            echo \"change-prompt(\${new_prompt})+change-header(${GREP_CMD} \${final_opts})+reload:${GREP_CMD} \${final_opts} ''\"" \
         --bind "alt-i:transform:
             [[ \"\${FZF_PROMPT}\" == *\"${__flag_ignore}\"* ]] &&
                 new_prompt=\${FZF_PROMPT/\"${__flag_ignore}\"/} ||
@@ -97,7 +98,7 @@ _fzf_grep_vim_action() {
             final_opts=\"\"
             [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && final_opts+=\" ${GREP_HIDDEN_OPT}\"
             [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && final_opts+=\" ${GREP_IGNORE_OPT}\"
-            echo \"change-prompt(\${new_prompt})+reload:${GREP_CMD} \${final_opts} ''\""
+            echo \"change-prompt(\${new_prompt})+change-header(${GREP_CMD} \${final_opts})+reload:${GREP_CMD} \${final_opts} ''\""
 }
 
 fzf_kit() {
