@@ -112,6 +112,7 @@ fi
 
 # aliases
 alias ci="source ${_scripts}/misc/cd-index.sh"
+alias ic="source ${_scripts}/misc/interactive-cd.sh"
 
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
