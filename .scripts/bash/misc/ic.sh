@@ -33,17 +33,53 @@ ic() {
     local path_parts=(${PWD//\// })
     local num_parts=${#path_parts[@]}
     local current_index=$((num_parts - 1))
+    local cnt_act=""
+    local last_cnt_act=""
+    local last_act=""
 
-    # Restore terminal state
-    _cleanup() {
-        printf "\r${CLEAR_LINE}"
+    # New line
+    _newline() {
+        printf "\r\n"
     }
 
+    __move_reset() {
+        last_act="$1"
+        last_cnt_act="$cnt_act"
+        cnt_act=""
+    }
+    __move_by() {
+        local step=$1
+        cnt_act=${cnt_act:-1}
+        (( current_index += step * cnt_act))
+        (( current_index = (current_index < 0) ? 0 : current_index ))
+        (( current_index = (current_index >= num_parts) ? num_parts - 1 : current_index ))
+    }
     # Key press down event handlers
-    _move_left()  { (( current_index > 0 )) && ((current_index--)); }
-    _move_right() { (( current_index < num_parts - 1 )) && ((current_index++)); }
-    _move_start() { current_index=0; }
-    _move_end()   { current_index=$((num_parts - 1)); }
+    _move_left() {
+        __move_by -1
+        __move_reset "_move_left"
+    }
+    _move_right() {
+        __move_by 1
+        __move_reset "_move_right"
+    }
+    _move_start() {
+        current_index=0
+        __move_reset "_move_start"
+    }
+    _move_middle() {
+        current_index=$((num_parts / 2))
+        __move_reset "_move_middle"
+    }
+    _move_end() {
+        current_index=$((num_parts - 1))
+        __move_reset "_move_end"
+    }
+    _move_last() {
+        cnt_act="$last_cnt_act"
+        declare -F "$last_act" > /dev/null && "$last_act"
+    }
+    _move_count() { [[ -z "$cnt_act" && "$1" == "0" ]] && _move_start || cnt_act+="$1"; }
     _change_dir() {
         # Build the target path from the selected index
         local target_dir="/"
@@ -92,16 +128,19 @@ ic() {
                     $'\x01' | $'\x1b[H' | $'\x1b[1') _move_start ;; # C-a, Home
                     $'\x05' | $'\x1b[F' | $'\x1b[4') _move_end ;;   # C-e, End
                     '') _change_dir; return 0 ;; # Enter key
-                    'q' | $'\x1b') _cleanup; return 0 ;; # q, or ESC
+                    'q' | $'\x1b') _newline; return 0 ;; # q, or ESC
                 esac
             else # Default to "vim" keymap
                 case "$key" in
-                    'h' | 'b' | $'\x1b[D') _move_left ;;  # h, b, Left Arrow
-                    'l' | 'w' | $'\x1b[C') _move_right ;; # l, w, Right Arrow
-                    '0' | $'\x1b[H' | $'\x1b[1') _move_start ;; # 0, Home
-                    '$' | $'\x1b[F' | $'\x1b[4') _move_end ;;   # $, End
+                    'h' | 'k' | 'b' | $'\x1b[D') _move_left ;;        # h, b, k, Left Arrow
+                    'l' | 'j' | 'w' | 'e' | $'\x1b[C') _move_right ;; # l, w, j, e, Right Arrow
+                    'H' | '^' | $'\x1b[H' | $'\x1b[1') _move_start ;; # H, ^, Home
+                    'L' | '$' | $'\x1b[F' | $'\x1b[4') _move_end ;;   # L, $, End
+                    'M') _move_middle ;;
+                    ';') _move_last ;; # ;
                     '') _change_dir; return 0 ;; # Enter key
-                    'q' | $'\x1b') _cleanup; return 0 ;; # q, or ESC
+                    'q' | $'\x1b') _newline; return 0 ;; # q, or ESC
+                    [0-9]) _move_count "$key" ;;
                 esac
             fi
         done
