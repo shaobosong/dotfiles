@@ -42,6 +42,7 @@ ic() {
         printf "\r\n"
     }
 
+    # Key press down event handlers
     __move_reset() {
         last_act="$1"
         last_cnt_act="$cnt_act"
@@ -54,7 +55,6 @@ ic() {
         (( current_index = (current_index < 0) ? 0 : current_index ))
         (( current_index = (current_index >= num_parts) ? num_parts - 1 : current_index ))
     }
-    # Key press down event handlers
     _move_left() {
         __move_by -1
         __move_reset "_move_left"
