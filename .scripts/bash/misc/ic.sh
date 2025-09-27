@@ -128,7 +128,6 @@ ic() {
                     $'\x01' | $'\x1b[H' | $'\x1b[1') _move_start ;; # C-a, Home
                     $'\x05' | $'\x1b[F' | $'\x1b[4') _move_end ;;   # C-e, End
                     '') _change_dir; return 0 ;; # Enter key
-                    'q' | $'\x1b') _newline; return 0 ;; # q, or ESC
                 esac
             else # Default to "vim" keymap
                 case "$key" in
@@ -139,10 +138,12 @@ ic() {
                     'M') _move_middle ;;
                     ';') _move_last ;; # ;
                     '') _change_dir; return 0 ;; # Enter key
-                    'q' | $'\x1b') _newline; return 0 ;; # q, or ESC
                     [0-9]) _move_count "$key" ;;
                 esac
             fi
+            case "$key" in
+                'q' | $'\x1b') _newline; return 0 ;; # q, or ESC
+            esac
         done
     }
 
