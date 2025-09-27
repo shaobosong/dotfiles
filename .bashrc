@@ -111,8 +111,6 @@ if ! shopt -oq posix; then
 fi
 
 # aliases
-alias ci="source ${_scripts}/misc/cd-index.sh"
-
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
 alias 2dec='printf %d\\n'
@@ -144,7 +142,12 @@ fi
 if test -f ${_scripts}/misc/fzf-kit.sh; then
     source ${_scripts}/misc/fzf-kit.sh
 fi
+if test -f ${_scripts}/misc/ci.sh; then
+    source ${_scripts}/misc/ci.sh
+fi
+if test -f ${_scripts}/misc/ic.sh; then
+    source ${_scripts}/misc/ic.sh
+fi
 if test -f ~/.bashrc_extra; then
     source ~/.bashrc_extra
 fi
-source ${_scripts}/misc/ic.sh
