@@ -140,7 +140,8 @@ ic() {
                 esac
             fi
             case "$key" in
-                '') _change_dir; return 0 ;; # Enter key
+                # FIXME: Tab key triggering issue
+                '') _change_dir; return 0 ;; # Enter, C-m, C-j
                 'q' | $'\x1b') _newline; return 0 ;; # q, or ESC
             esac
         done
