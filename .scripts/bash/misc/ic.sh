@@ -23,11 +23,11 @@ ic() {
     [[ "$PWD" == "/" ]] && return 0
 
     # ANSI escape codes for TUI rendering
-    local HL_START="\e[7m"      # Highlight start (reverse video)
-    local HL_END="\e[0m"        # Highlight end (reset)
-    local CURSOR_HIDE="\e[?25l" # Hide cursor
-    local CURSOR_SHOW="\e[?25h" # Show cursor
-    local CLEAR_LINE="\e[K"     # Clear line from cursor to end
+    local HL_START=$({ tput smso >/dev/null 2>&1 && tput smso; } || { tput setaf 3 >/dev/null 2>&1 && tput setaf 3; } || echo '**') # Highlight start (standout mode)
+    local HL_END=$({ tput rmso >/dev/null 2>&1 && tput rmso; } || { tput sgr0 >/dev/null 2>&1 && tput sgr0; } || echo '**')         # Highlight end (exit standout mode)
+    local CURSOR_HIDE=$(tput civis) # Hide cursor
+    local CURSOR_SHOW=$(tput cnorm) # Show cursor
+    local CLEAR_LINE=$(tput el)     # Clear line from cursor to end
 
     # Split path into an array: /a/b/c -> (a b c)
     local path_parts=(${PWD//\// })
@@ -86,7 +86,7 @@ ic() {
         for i in $(seq 0 $current_index); do
             target_dir+="${path_parts[i]}/"
         done
-        printf "\r${CLEAR_LINE}${target_dir}\n"
+        printf "\r${target_dir}${CLEAR_LINE}\n"
         cd "$target_dir"
     }
 
