@@ -51,6 +51,7 @@ local dir = {
           confirm = { "<CR>" },
           cancel  = { 'q', "<ESC>" },
         },
+        show_help = false,
       }
 
       -- Setup cdup.nvim
