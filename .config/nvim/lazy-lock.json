@@ -1,6 +1,6 @@
 {
   "aerial.nvim": { "branch": "master", "commit": "2e00d1d4248f08dddfceacb8d2996e51e13e00f6" },
-  "cdup.nvim": { "branch": "master", "commit": "aed04fd3216b62718933e3da18521fe82eee8fec" },
+  "cdup.nvim": { "branch": "master", "commit": "0e3ac2dfc415e1e2d01b2844d9ab1b271b285e2f" },
   "chdir.nvim": { "branch": "main", "commit": "4c2614216217c7bf60fc39b222e0628d13ecef60" },
   "cmp-buffer": { "branch": "main", "commit": "b74fab3656eea9de20a9b8116afa3cfc4ec09657" },
   "cmp-cmdline": { "branch": "main", "commit": "d126061b624e0af6c3a556428712dd4d4194ec6d" },
