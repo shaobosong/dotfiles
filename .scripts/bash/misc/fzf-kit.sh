@@ -19,25 +19,29 @@ _check_commands() {
         FIND_DIRS_CMD="fd --type directory"
         FIND_HIDDEN_OPT="--hidden"
         FIND_IGNORE_OPT="--no-ignore"
+        FIND_FLAG_HIDDEN="(+hidden)"
+        FIND_FLAG_IGNORE="(+ignore)"
     elif command -v find &> /dev/null; then
         FIND_FILES_CMD="find . -type f"
         FIND_DIRS_CMD="find . -mindepth 1 -type d"
         FIND_HIDDEN_OPT=""
         FIND_IGNORE_OPT=""
     else
-        echo "Error: Failed to find 'fd' or 'find'" >&2
+        echo "Error: Failed to locate 'fd' or 'find'" >&2
     fi
 
     if command -v rg &> /dev/null; then
         GREP_CMD="rg --line-number --color=always --no-heading --follow --no-binary --no-config"
         GREP_HIDDEN_OPT="--hidden"
         GREP_IGNORE_OPT="--no-ignore"
+        GREP_FLAG_HIDDEN="(+hidden)"
+        GREP_FLAG_IGNORE="(+ignore)"
     elif command -v grep &> /dev/null; then
         GREP_CMD="grep --line-number --color=always --dereference-recursive --binary-files=without-match"
         GREP_HIDDEN_OPT=""
         GREP_IGNORE_OPT=""
     else
-        echo "Error: Failed to find 'rg' or 'grep'" >&2
+        echo "Error: Failed to locate 'rg' or 'grep'" >&2
     fi
 
     if command -v nvim &> /dev/null; then
@@ -45,7 +49,7 @@ _check_commands() {
     elif command -v vim &> /dev/null; then
         VIM_CMD="vim"
     else
-        echo "Error: Failed to find 'neovim' or 'vim'" >&2
+        echo "Error: Failed to locate 'neovim' or 'vim'" >&2
     fi
 
     if command -v bat &> /dev/null; then
@@ -55,14 +59,12 @@ _check_commands() {
         CAT_CMD="cat -n"
         CAT_HIGHLIGHT_LINE_OPT="||:"
     else
-        echo "Error: Failed to find 'bat' or 'cat'" >&2
+        echo "Error: Failed to locate 'bat' or 'cat'" >&2
     fi
 }
 
 _fzf_file_vim_action() {
     export FD_CONFIG_PATH=
-    __flag_hidden="(+hidden)"
-    __flag_ignore="(+ignore)"
 
     ${FIND_FILES_CMD} | ${FZF_CMD} \
         --ghost="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
@@ -73,27 +75,25 @@ _fzf_file_vim_action() {
         --bind "alt-J:jump,jump:become(${VIM_CMD} {})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {})" \
         --bind "alt-h:transform:
-            [[ \"\${FZF_PROMPT}\" == *\"${__flag_hidden}\"* ]] &&
-                new_prompt=\${FZF_PROMPT/\"${__flag_hidden}\"/} ||
-                new_prompt=\${FZF_PROMPT/>/\"${__flag_hidden}\">}
+            [[ \"\${FZF_PROMPT}\" == *\"${FIND_FLAG_HIDDEN}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${FIND_FLAG_HIDDEN}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${FIND_FLAG_HIDDEN}\">}
             new_cmd=\"${FIND_FILES_CMD}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${FIND_IGNORE_OPT}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${FIND_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${FIND_FLAG_IGNORE}\"* ]] && new_cmd+=\" ${FIND_IGNORE_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${FIND_FLAG_HIDDEN}\"* ]] && new_cmd+=\" ${FIND_HIDDEN_OPT}\"
             echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd\"" \
         --bind "alt-i:transform:
-            [[ \"\${FZF_PROMPT}\" == *\"${__flag_ignore}\"* ]] &&
-                new_prompt=\${FZF_PROMPT/\"${__flag_ignore}\"/} ||
-                new_prompt=\${FZF_PROMPT/>/\"${__flag_ignore}\">}
+            [[ \"\${FZF_PROMPT}\" == *\"${FIND_FLAG_IGNORE}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${FIND_FLAG_IGNORE}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${FIND_FLAG_IGNORE}\">}
             new_cmd=\"${FIND_FILES_CMD}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${FIND_HIDDEN_OPT}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${FIND_IGNORE_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${FIND_FLAG_HIDDEN}\"* ]] && new_cmd+=\" ${FIND_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${FIND_FLAG_IGNORE}\"* ]] && new_cmd+=\" ${FIND_IGNORE_OPT}\"
             echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd\""
 }
 
 _fzf_grep_vim_action() {
     # Note: exclusive
-    __flag_hidden="(+hidden)"
-    __flag_ignore="(+ignore)"
 
     FZF_DEFAULT_COMMAND="${GREP_CMD} ''" ${FZF_CMD} \
         --ansi \
@@ -108,20 +108,20 @@ _fzf_grep_vim_action() {
         --bind "alt-J:jump,jump:become(${VIM_CMD} {1} +{2})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {1} +{2})" \
         --bind "alt-h:transform:
-            [[ \"\${FZF_PROMPT}\" == *\"${__flag_hidden}\"* ]] &&
-                new_prompt=\${FZF_PROMPT/\"${__flag_hidden}\"/} ||
-                new_prompt=\${FZF_PROMPT/>/\"${__flag_hidden}\">}
+            [[ \"\${FZF_PROMPT}\" == *\"${GREP_FLAG_HIDDEN}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${GREP_FLAG_HIDDEN}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${GREP_FLAG_HIDDEN}\">}
             new_cmd=\"${GREP_CMD}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${GREP_IGNORE_OPT}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${GREP_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${GREP_FLAG_IGNORE}\"* ]] && new_cmd+=\" ${GREP_IGNORE_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${GREP_FLAG_HIDDEN}\"* ]] && new_cmd+=\" ${GREP_HIDDEN_OPT}\"
             echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd ''\"" \
         --bind "alt-i:transform:
-            [[ \"\${FZF_PROMPT}\" == *\"${__flag_ignore}\"* ]] &&
-                new_prompt=\${FZF_PROMPT/\"${__flag_ignore}\"/} ||
-                new_prompt=\${FZF_PROMPT/>/\"${__flag_ignore}\">}
+            [[ \"\${FZF_PROMPT}\" == *\"${GREP_FLAG_IGNORE}\"* ]] &&
+                new_prompt=\${FZF_PROMPT/\"${GREP_FLAG_IGNORE}\"/} ||
+                new_prompt=\${FZF_PROMPT/>/\"${GREP_FLAG_IGNORE}\">}
             new_cmd=\"${GREP_CMD}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_hidden}\"* ]] && new_cmd+=\" ${GREP_HIDDEN_OPT}\"
-            [[ \"\${new_prompt}\" == *\"${__flag_ignore}\"* ]] && new_cmd+=\" ${GREP_IGNORE_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${GREP_FLAG_HIDDEN}\"* ]] && new_cmd+=\" ${GREP_HIDDEN_OPT}\"
+            [[ \"\${new_prompt}\" == *\"${GREP_FLAG_IGNORE}\"* ]] && new_cmd+=\" ${GREP_IGNORE_OPT}\"
             echo \"change-prompt(\$new_prompt)+change-header(\$new_cmd)+reload:\$new_cmd ''\""
 }
 
