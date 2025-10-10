@@ -27,6 +27,61 @@ local dir = {
       })
     end,
   },
+  {
+    "shaobosong/cdup.nvim",
+    lazy = true,
+    cmd = { "Cdup" },
+    keys = {
+      { "<leader>cu", "<cmd>Cdup<cr>", mode = "" },
+    },
+    config = function ()
+      local function make_termcodes(keys)
+        local t = {}
+
+        for name, key in pairs(keys) do
+          t[name] = vim.api.nvim_replace_termcodes(key, true, true, true)
+        end
+        return t
+      end
+
+      local termcodes = make_termcodes({
+        CR    = "<CR>",
+        ESC   = "<ESC>",
+        Left  = "<Left>",
+        Right = "<Right>",
+        Up    = "<Up>",
+
+        Down  = "<Down>",
+
+        Home  = "<Home>",
+        End   = "<End>",
+        Tab   = "<Tab>",
+      })
+
+      -- Default configuration
+      local default_config = {
+        -- Highlight group for the selected directory name.
+        -- Good options: 'TermCursor', 'Visual', 'IncSearch', 'Search'
+        highlight_group = 'TermCursor',
+        -- Keymaps for navigation. You can customize these.
+        keymap = {
+          -- VIM-style keys (default)
+          left    = { 'h', 'b', termcodes.Left },
+          right   = { 'l', 'w', termcodes.Right },
+          head    = { 'H', '0', termcodes.Home },
+          tail    = { 'L', '$', termcodes.End },
+
+          middle  = { 'M' },
+          confirm = { termcodes.CR },
+          cancel  = { 'q', termcodes.ESC },
+        },
+      }
+
+      -- Setup cdup.nvim
+      require("cdup").setup(default_config)
+
+    end,
+  }
 }
 
 local code = {
@@ -49,6 +104,8 @@ local code = {
         backends = {
           ['_'] = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
           c = { "lsp" },
+          c3 = { "treesitter" },
+          zig = { "treesitter" },
         },
 
         layout = {
