@@ -35,29 +35,6 @@ local dir = {
       { "<leader>cu", "<cmd>Cdup<cr>", mode = "" },
     },
     config = function ()
-      local function make_termcodes(keys)
-        local t = {}
-
-        for name, key in pairs(keys) do
-          t[name] = vim.api.nvim_replace_termcodes(key, true, true, true)
-        end
-        return t
-      end
-
-      local termcodes = make_termcodes({
-        CR    = "<CR>",
-        ESC   = "<ESC>",
-        Left  = "<Left>",
-        Right = "<Right>",
-        Up    = "<Up>",
-
-        Down  = "<Down>",
-
-        Home  = "<Home>",
-        End   = "<End>",
-        Tab   = "<Tab>",
-      })
-
       -- Default configuration
       local default_config = {
         -- Highlight group for the selected directory name.
@@ -66,20 +43,18 @@ local dir = {
         -- Keymaps for navigation. You can customize these.
         keymap = {
           -- VIM-style keys (default)
-          left    = { 'h', 'b', termcodes.Left },
-          right   = { 'l', 'w', termcodes.Right },
-          head    = { 'H', '0', termcodes.Home },
-          tail    = { 'L', '$', termcodes.End },
-
+          left    = { 'h', 'b', "<Left>" },
+          right   = { 'l', 'w', "<Right>" },
+          head    = { 'H', '0', "<Home>" },
+          tail    = { 'L', '$', "<End>" },
           middle  = { 'M' },
-          confirm = { termcodes.CR },
-          cancel  = { 'q', termcodes.ESC },
+          confirm = { "<CR>" },
+          cancel  = { 'q', "<ESC>" },
         },
       }
 
       -- Setup cdup.nvim
       require("cdup").setup(default_config)
-
     end,
   }
 }
