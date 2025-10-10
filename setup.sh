@@ -30,6 +30,7 @@ backup() {
 set -- \
     ".bashrc" \
     ".config/alacritty" \
+    ".config/git" \
     ".config/fd" \
     ".config/nvim" \
     ".config/ripgrep" \
