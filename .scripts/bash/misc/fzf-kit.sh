@@ -5,10 +5,16 @@ FIND_FILES_CMD= # fd
 FIND_DIRS_CMD= # fd
 FIND_HIDDEN_OPT=
 FIND_IGNORE_OPT=
+FIND_FLAG_HIDDEN=
+FIND_FLAG_IGNORE=
+FIND_GHOST=
 FIND_HISTORY=
 GREP_CMD= # rg
 GREP_HIDDEN_OPT=
 GREP_IGNORE_OPT=
+GREP_FLAG_HIDDEN=
+GREP_FLAG_IGNORE=
+GREP_GHOST=
 GREP_HISTORY=
 VIM_CMD= # nvim
 CAT_CMD= # bat
@@ -24,12 +30,14 @@ _check_commands() {
         FIND_IGNORE_OPT="--no-ignore"
         FIND_FLAG_HIDDEN="(+hidden)"
         FIND_FLAG_IGNORE="(+ignore)"
+        FIND_GHOST="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden"
         FIND_HISTORY="${RUNTIME_DIR}/fd_vim_history"
     elif command -v find &> /dev/null; then
         FIND_FILES_CMD="find . -type f"
         FIND_DIRS_CMD="find . -mindepth 1 -type d"
         FIND_HIDDEN_OPT=""
         FIND_IGNORE_OPT=""
+        FIND_GHOST="<enter>: Vim | <ctrl-v>: View"
         FIND_HISTORY="${RUNTIME_DIR}/find_vim_history"
     else
         echo "Error: Failed to locate 'fd' or 'find'" >&2
@@ -41,11 +49,13 @@ _check_commands() {
         GREP_IGNORE_OPT="--no-ignore"
         GREP_FLAG_HIDDEN="(+hidden)"
         GREP_FLAG_IGNORE="(+ignore)"
+        GREP_GHOST="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden"
         GREP_HISTORY="${RUNTIME_DIR}/rg_vim_history"
     elif command -v grep &> /dev/null; then
         GREP_CMD="grep --line-number --color=always --dereference-recursive --binary-files=without-match"
         GREP_HIDDEN_OPT=""
         GREP_IGNORE_OPT=""
+        GREP_GHOST="<enter>: Vim | <ctrl-v>: View"
         GREP_HISTORY="${RUNTIME_DIR}/grep_vim_history"
     else
         echo "Error: Failed to locate 'rg' or 'grep'" >&2
@@ -74,7 +84,7 @@ _fzf_file_vim_action() {
     export FD_CONFIG_PATH=
 
     ${FIND_FILES_CMD} | ${FZF_CMD} \
-        --ghost="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
+        --ghost="${FIND_GHOST}" \
         --header="${FIND_FILES_CMD}" \
         --prompt="File> " \
         --preview "${CAT_CMD} {}" \
@@ -109,7 +119,7 @@ _fzf_grep_vim_action() {
         --nth=3.. \
         --prompt="Grep> " \
         --header="${GREP_CMD}" \
-        --ghost="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
+        --ghost="${GREP_GHOST}" \
         --preview "${CAT_CMD} {1} ${CAT_HIGHLIGHT_LINE_OPT} {2}" \
         --preview-window 'up,50%,border-down,+{2}/2' \
         --history="${GREP_HISTORY}" \
