@@ -35,8 +35,6 @@ set -- \
     ".config/fd" \
     ".config/nvim" \
     ".config/ripgrep" \
-    ".gdbinit" \
-    ".gitconfig" \
     ".profile" \
     ".scripts" \
     ".ssh/config" \
