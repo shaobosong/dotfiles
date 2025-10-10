@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
+RUNTIME_DIR="/tmp/fzf-kit.${USER}"
 FIND_FILES_CMD= # fd
 FIND_DIRS_CMD= # fd
 FIND_HIDDEN_OPT=
 FIND_IGNORE_OPT=
+FIND_HISTORY=
 GREP_CMD= # rg
 GREP_HIDDEN_OPT=
 GREP_IGNORE_OPT=
+GREP_HISTORY=
 VIM_CMD= # nvim
 CAT_CMD= # bat
 CAT_HIGHLIGHT_LINE_OPT=
@@ -21,11 +24,13 @@ _check_commands() {
         FIND_IGNORE_OPT="--no-ignore"
         FIND_FLAG_HIDDEN="(+hidden)"
         FIND_FLAG_IGNORE="(+ignore)"
+        FIND_HISTORY="${RUNTIME_DIR}/fd_vim_history"
     elif command -v find &> /dev/null; then
         FIND_FILES_CMD="find . -type f"
         FIND_DIRS_CMD="find . -mindepth 1 -type d"
         FIND_HIDDEN_OPT=""
         FIND_IGNORE_OPT=""
+        FIND_HISTORY="${RUNTIME_DIR}/find_vim_history"
     else
         echo "Error: Failed to locate 'fd' or 'find'" >&2
     fi
@@ -36,10 +41,12 @@ _check_commands() {
         GREP_IGNORE_OPT="--no-ignore"
         GREP_FLAG_HIDDEN="(+hidden)"
         GREP_FLAG_IGNORE="(+ignore)"
+        GREP_HISTORY="${RUNTIME_DIR}/rg_vim_history"
     elif command -v grep &> /dev/null; then
         GREP_CMD="grep --line-number --color=always --dereference-recursive --binary-files=without-match"
         GREP_HIDDEN_OPT=""
         GREP_IGNORE_OPT=""
+        GREP_HISTORY="${RUNTIME_DIR}/grep_vim_history"
     else
         echo "Error: Failed to locate 'rg' or 'grep'" >&2
     fi
@@ -71,6 +78,7 @@ _fzf_file_vim_action() {
         --header="${FIND_FILES_CMD}" \
         --prompt="File> " \
         --preview "${CAT_CMD} {}" \
+        --history="${FIND_HISTORY}" \
         --bind "enter:become(${VIM_CMD} {})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {})" \
@@ -104,6 +112,7 @@ _fzf_grep_vim_action() {
         --ghost="<enter>: Vim | <ctrl-v>: View | <alt-i>: Ignore | <alt-h>: Hidden" \
         --preview "${CAT_CMD} {1} ${CAT_HIGHLIGHT_LINE_OPT} {2}" \
         --preview-window 'up,50%,border-down,+{2}/2' \
+        --history="${GREP_HISTORY}" \
         --bind "enter:become(${VIM_CMD} {1} +{2})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {1} +{2})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {1} +{2})" \
@@ -127,6 +136,8 @@ _fzf_grep_vim_action() {
 
 fzf_kit() {
     _check_commands
+
+    test -d ${RUNTIME_DIR} || mkdir -p ${RUNTIME_DIR}
 
     declare -A fzf_actions
     fzf_actions=(
