@@ -124,6 +124,8 @@ export PROMPT_COMMAND="history -a; #history -n"
 export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first,alt-enter:accept"
 export DELTA_FEATURES='+side-by-side'
 export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
+export CARGO_HOME=$HOME/.cargo
+export RUSTUP_HOME=$HOME/.rustup
 export RUSTUP_UPDATE_ROOT=https://mirrors.ustc.edu.cn/rust-static/rustup
 export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static
 export GOMODCACHE=$HOME/.cache/go/pkg/mod
