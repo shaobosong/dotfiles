@@ -15,6 +15,7 @@ return {
         'lua',
         'python',
         'rust',
+        'zig',
       }
     end,
   },
