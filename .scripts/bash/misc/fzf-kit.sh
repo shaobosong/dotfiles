@@ -24,7 +24,7 @@ VIM_CMD= # nvim
 CAT_CMD= # bat
 CAT_HIGHLIGHT_LINE_OPT=
 
-FZF_CMD="fzf --bind=change:first"
+FZF_CMD="fzf --bind=change:first --color dark"
 
 _check_commands() {
     if command -v fd &> /dev/null; then
