@@ -56,7 +56,6 @@ set -- \
     "../generic/cmake-build" \
     "../generic/configure-build" \
     "../generic/meson-build" \
-    "../misc/fzf-kit.sh" \
     "../misc/make-image.sh" \
     "../misc/scp-tar.sh" \
     "../misc/win-ldd.sh"
