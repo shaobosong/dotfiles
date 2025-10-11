@@ -49,5 +49,24 @@ for file in "${@}"; do
     ln -nsTv "${ROOT}/${file}" "${HOME}/${file}"
 done
 
+mkdir -pv "${ROOT}/.scripts/bash/link"
+cd "${ROOT}/.scripts/bash/link"
+
+set -- \
+    "../generic/cmake-build" \
+    "../generic/configure-build" \
+    "../generic/meson-build" \
+    "../misc/fzf-kit.sh" \
+    "../misc/make-image.sh" \
+    "../misc/scp-tar.sh" \
+    "../misc/win-ldd.sh"
+
+for file in "${@}"; do
+    basename=${file##*/}
+    prefix=${basename%.*}
+    ln -fnsTv "${file}" "${prefix}"
+done
+
+
 echo "Succeed"
 exit 0
