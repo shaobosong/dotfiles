@@ -1,23 +1,23 @@
-# ██╗ ██████╗
-# ██║██╔════╝
-# ██║██║
-# ██║██║
-# ██║╚██████╗
-# ╚═╝ ╚═════╝ ic: Interactively change directory upwards
+#  ██████╗██╗   ██╗
+# ██╔════╝██║   ██║
+# ██║     ██║   ██║
+# ██║     ██║   ██║
+# ╚██████╗╚██████╔╝
+#  ╚═════╝ ╚═════╝  cu: Interactively change directory upwards
 #
 # Usage:
-#   1. Add a source to "ic.sh" in ~/.bashrc
-#   2. (Optional) Set keymap before sourcing: export IC_KEYMAP="emacs"
+#   1. Add a source to "cu.sh" in ~/.bashrc
+#   2. (Optional) Set keymap before sourcing: export CU_KEYMAP="emacs"
 #   3. Run `source ~/.bashrc` or open a new terminal
-#   4. Type `ic` in any nested directory
+#   4. Type `cu` in any nested directory
 #
 # Configuration:
-#   - IC_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
+#   - CU_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
 #
 
-ic() {
+cu() {
     # Set default keymap if not configured by the user
-    : "${IC_KEYMAP:=vim}"
+    : "${CU_KEYMAP:=vim}"
 
     # Exit if in root directory
     [[ "$PWD" == "/" ]] && return 0
@@ -121,7 +121,7 @@ ic() {
             fi
 
             # Key dispatcher based on the configured keymap
-            if [[ "$IC_KEYMAP" == "emacs" ]]; then
+            if [[ "$CU_KEYMAP" == "emacs" ]]; then
                 case "$key" in
                     $'\x02' | $'\x1b[D' | $'\x1bb') _move_left ;;  # C-b, Left Arrow, Alt-b
                     $'\x06' | $'\x1b[C' | $'\x1bf') _move_right ;; # C-f, Right Arrow, Alt-f
