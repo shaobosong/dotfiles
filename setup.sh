@@ -36,11 +36,10 @@ set -- \
     ".config/nvim" \
     ".config/ripgrep" \
     ".config/tmux" \
+    ".config/vim" \
     ".profile" \
     ".scripts" \
-    ".ssh/config" \
-    ".tmux.conf" \
-    ".vimrc"
+    ".ssh/config"
 
 mkdir -pv "${HOME}/.config"
 mkdir -pv "${HOME}/.ssh"
