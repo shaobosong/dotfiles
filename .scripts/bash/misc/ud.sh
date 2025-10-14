@@ -1,26 +1,26 @@
-#  ██████╗██╗   ██╗
-# ██╔════╝██║   ██║
-# ██║     ██║   ██║
-# ██║     ██║   ██║
-# ╚██████╗╚██████╔╝
-#  ╚═════╝ ╚═════╝  cu: Interactively change directory upwards
+# ██╗   ██╗██████╗
+# ██║   ██║██╔══██╗
+# ██║   ██║██║  ██║
+# ██║   ██║██║  ██║
+# ╚██████╔╝██████╔╝
+#  ╚═════╝ ╚═════╝ ud: Interactively change directory upwards
 #
 # Usage:
-#   1. Add a source to "cu.sh" in ~/.bashrc
-#   2. (Optional) Set keymap before sourcing: export CU_KEYMAP="emacs"
+#   1. Add a source to "ud.sh" in ~/.bashrc
+#   2. (Optional) Set keymap before sourcing: export UD_KEYMAP="emacs"
 #   3. Run `source ~/.bashrc` or open a new terminal
-#   4. Type `cu` in any nested directory
+#   4. Type `ud` in any nested directory
 #
 # Configuration:
-#   - CU_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
+#   - UD_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
 #
 
-__cu_select_or_error__() {
+__ud_select_or_error__() {
     # Set default keymap if not configured by the user
-    : "${CU_KEYMAP:=vim}"
+    : "${UD_KEYMAP:=vim}"
 
     # Exit if in root directory
-    [[ "$PWD" == "/" ]] && echo "cu: already at root directory." && return 1
+    [[ "$PWD" == "/" ]] && echo "ud: already at root directory." && return 1
 
     # ANSI escape codes for TUI rendering
     local HL_START=$({ tput smso >/dev/null 2>&1 && tput smso; } || { tput setaf 3 >/dev/null 2>&1 && tput setaf 3; } || echo '**') # Highlight start (standout mode)
@@ -112,7 +112,7 @@ __cu_select_or_error__() {
             fi
 
             # Key dispatcher based on the configured keymap
-            if [[ "$CU_KEYMAP" == "emacs" ]]; then
+            if [[ "$UD_KEYMAP" == "emacs" ]]; then
                 case "$key" in
                     $'\x02' | $'\x1b[D' | $'\x1bb') _move_left ;;  # C-b, Left Arrow, Alt-b
                     $'\x06' | $'\x1b[C' | $'\x1bf') _move_right ;; # C-f, Right Arrow, Alt-f
@@ -133,7 +133,7 @@ __cu_select_or_error__() {
             case "$key" in
                 # FIXME: Tab key triggering issue
                 '') _new_dir; return 0 ;; # Enter, C-m, C-j
-                'q' | $'\x1b') echo "cu: exit" && return 1 ;; # q, or ESC
+                'q' | $'\x1b') echo "ud: exit" && return 1 ;; # q, or ESC
             esac
         done
     }
@@ -141,10 +141,10 @@ __cu_select_or_error__() {
     _loop
 }
 
-__cu_dir_widget__() {
+__ud_dir_widget__() {
     local clear_line=$(tput el) # Clear line from cursor to end
     local ret retcode selected error
-    ret="$(__cu_select_or_error__)"; retcode=$?
+    ret="$(__ud_select_or_error__)"; retcode=$?
     printf "\r${clear_line}"
     if test "$retcode" -eq 0; then
         selected="$ret"
@@ -154,10 +154,10 @@ __cu_dir_widget__() {
     return "$retcode"
 }
 
-cu() {
+ud() {
     local clear_line=$(tput el) # Clear line from cursor to end
     local ret retcode target_dir error
-    ret="$(__cu_select_or_error__)"; retcode=$?
+    ret="$(__ud_select_or_error__)"; retcode=$?
     if test "$retcode" -ne 0; then
         error="$ret"
         test -n "$error" &&
@@ -175,8 +175,8 @@ if (( BASH_VERSINFO[0] < 4 )); then
     # TODO: Compatible with lower 'bash' version
     false
 else
-    bind -m emacs-standard -x '"\eh": __cu_dir_widget__'
-    bind -m vi-command -x '"\eh": __cu_dir_widget__'
-    bind -m vi-insert -x '"\eh": __cu_dir_widget__'
+    bind -m emacs-standard -x '"\eh": __ud_dir_widget__'
+    bind -m vi-command -x '"\eh": __ud_dir_widget__'
+    bind -m vi-insert -x '"\eh": __ud_dir_widget__'
     :
 fi

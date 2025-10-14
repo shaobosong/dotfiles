@@ -158,8 +158,8 @@ fi
 if test -f ${_scripts}/misc/ci.sh; then
     source ${_scripts}/misc/ci.sh
 fi
-if test -f ${_scripts}/misc/cu.sh; then
-    source ${_scripts}/misc/cu.sh
+if test -f ${_scripts}/misc/ud.sh; then
+    source ${_scripts}/misc/ud.sh
 fi
 if test -f ~/.bashrc_extra; then
     source ~/.bashrc_extra
