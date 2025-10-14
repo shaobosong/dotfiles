@@ -15,19 +15,18 @@
 #   - CU_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
 #
 
-cu() {
+__cu_select_or_error__() {
     # Set default keymap if not configured by the user
     : "${CU_KEYMAP:=vim}"
 
     # Exit if in root directory
-    [[ "$PWD" == "/" ]] && return 0
+    [[ "$PWD" == "/" ]] && echo "cu: already at root directory." && return 1
 
     # ANSI escape codes for TUI rendering
     local HL_START=$({ tput smso >/dev/null 2>&1 && tput smso; } || { tput setaf 3 >/dev/null 2>&1 && tput setaf 3; } || echo '**') # Highlight start (standout mode)
     local HL_END=$({ tput rmso >/dev/null 2>&1 && tput rmso; } || { tput sgr0 >/dev/null 2>&1 && tput sgr0; } || echo '**')         # Highlight end (exit standout mode)
     local CURSOR_HIDE=$(tput civis) # Hide cursor
     local CURSOR_SHOW=$(tput cnorm) # Show cursor
-    local CLEAR_LINE=$(tput el)     # Clear line from cursor to end
 
     # Split path into an array: /a/b/c -> (a b c)
     local path_parts=(${PWD//\// })
@@ -36,11 +35,6 @@ cu() {
     local cnt_act=""
     local last_cnt_act=""
     local last_act=""
-
-    # New line
-    _newline() {
-        printf "\r\n"
-    }
 
     # Key press down event handlers
     __move_reset() {
@@ -80,36 +74,33 @@ cu() {
         declare -F "$last_act" > /dev/null && "$last_act"
     }
     _move_count() { [[ -z "$cnt_act" && "$1" == "0" ]] && _move_start || cnt_act+="$1"; }
-    _change_dir() {
+    _new_dir() {
         # Build the target path from the selected index
-        local target_dir="/"
+        local target_dir=""
         for i in $(seq 0 $current_index); do
-            target_dir+="${path_parts[i]}/"
+            target_dir+="/${path_parts[i]}"
         done
-        printf "\r${target_dir}${CLEAR_LINE}\n"
-        cd "$target_dir"
+        echo "${target_dir}"
     }
 
     # Renders the interactive path string
     _render() {
-        local display_path="/"
+        local display_path=""
         for i in "${!path_parts[@]}"; do
             if [[ $i -eq $current_index ]]; then
-                display_path+="${HL_START}${path_parts[i]}${HL_END}/"
+                display_path+="/${HL_START}${path_parts[i]}${HL_END}"
             else
-                display_path+="${path_parts[i]}/"
+                display_path+="/${path_parts[i]}"
             fi
         done
         # \r moves cursor to line start, then we print and clear extra chars
-        printf "\r${display_path}${CLEAR_LINE}"
+        printf "\r${display_path}"
     }
 
     _loop() {
         while true; do
-            _render
             # Read a single character (-s: silent, -n 1: one char)
-            # Using $'' syntax for control characters
-            read -rsn1 key
+            read -p "$(_render)" -rsn1 key
 
             # Handle multi-byte sequences for Alt keys and arrows
             if [[ "$key" == $'\x1b' ]]; then # ESC character
@@ -141,11 +132,51 @@ cu() {
             fi
             case "$key" in
                 # FIXME: Tab key triggering issue
-                '') _change_dir; return 0 ;; # Enter, C-m, C-j
-                'q' | $'\x1b') _newline; return 0 ;; # q, or ESC
+                '') _new_dir; return 0 ;; # Enter, C-m, C-j
+                'q' | $'\x1b') echo "cu: exit" && return 1 ;; # q, or ESC
             esac
         done
     }
 
     _loop
 }
+
+__cu_dir_widget__() {
+    local clear_line=$(tput el) # Clear line from cursor to end
+    local ret retcode selected error
+    ret="$(__cu_select_or_error__)"; retcode=$?
+    printf "\r${clear_line}"
+    if test "$retcode" -eq 0; then
+        selected="$ret"
+        READLINE_LINE="${READLINE_LINE:0:$READLINE_POINT}$selected${READLINE_LINE:$READLINE_POINT}"
+        READLINE_POINT=$(( READLINE_POINT + ${#selected} ))
+    fi
+    return "$retcode"
+}
+
+cu() {
+    local clear_line=$(tput el) # Clear line from cursor to end
+    local ret retcode target_dir error
+    ret="$(__cu_select_or_error__)"; retcode=$?
+    if test "$retcode" -ne 0; then
+        error="$ret"
+        test -n "$error" &&
+            printf "\r${error}${clear_line}\n" ||
+            printf "\r${clear_line}"
+    else
+        target_dir="$ret"
+        printf "\r${target_dir}${clear_line}\n"
+        cd "$target_dir"
+    fi
+    return "$retcode"
+}
+
+if (( BASH_VERSINFO[0] < 4 )); then
+    # TODO: Compatible with lower 'bash' version
+    false
+else
+    bind -m emacs-standard -x '"\eh": __cu_dir_widget__'
+    bind -m vi-command -x '"\eh": __cu_dir_widget__'
+    bind -m vi-insert -x '"\eh": __cu_dir_widget__'
+    :
+fi
