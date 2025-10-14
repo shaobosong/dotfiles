@@ -30,11 +30,12 @@ backup() {
 set -- \
     ".bashrc" \
     ".config/alacritty" \
+    ".config/fd" \
     ".config/gdb" \
     ".config/git" \
-    ".config/fd" \
     ".config/nvim" \
     ".config/ripgrep" \
+    ".config/tmux" \
     ".profile" \
     ".scripts" \
     ".ssh/config" \
@@ -65,7 +66,6 @@ for file in "${@}"; do
     prefix=${basename%.*}
     ln -fnsTv "${file}" "${prefix}"
 done
-
 
 echo "Succeed"
 exit 0
