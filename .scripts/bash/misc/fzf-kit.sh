@@ -167,14 +167,6 @@ fzf_kit() {
         ["grep-vim"]="_fzf_grep_vim_action"
     )
 
-    if test -f /usr/share/fzf/key-bindings.bash; then
-        source /usr/share/fzf/key-bindings.bash
-        fzf_actions+=(
-            ["file"]="fzf-file-widget"
-            ["history"]="__fzf_history__"
-        )
-    fi
-
     __options=$(printf "%s\n" "${!fzf_actions[@]}" | sort)
 
     __choice=$(echo -e "$__options" | ${FZF_CMD} \
