@@ -132,13 +132,12 @@ _fzf_file_vim_action() {
         --bind "enter:become(${VIM_CMD} {})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {})" \
+        --bind "f4:toggle-preview" \
         --bind "${FIND_BIND_HIDDEN}" \
         --bind "${FIND_BIND_IGNORE}"
 }
 
 _fzf_grep_vim_action() {
-    # Note: exclusive
-
     FZF_DEFAULT_COMMAND="${GREP_CMD} ''" ${FZF_CMD} \
         --ansi \
         --delimiter=: \
@@ -152,6 +151,7 @@ _fzf_grep_vim_action() {
         --bind "enter:become(${VIM_CMD} {1} +{2})" \
         --bind "alt-J:jump,jump:become(${VIM_CMD} {1} +{2})" \
         --bind "ctrl-v:execute(${VIM_CMD} -R {1} +{2})" \
+        --bind "f4:toggle-preview" \
         --bind "${GREP_BIND_HIDDEN}" \
         --bind "${GREP_BIND_IGNORE}"
 }
