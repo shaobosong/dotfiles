@@ -170,11 +170,11 @@ ud() {
     if test "$retcode" -ne 0; then
         error="$ret"
         test -n "$error" &&
-            printf "\r${clear_line}${error}" ||
+            printf "\r${clear_line}%s" "${error}" >&2 ||
             printf "\r${clear_line}"
     else
         target_dir="$ret"
-        printf "\r${clear_line}${target_dir}\n"
+        printf "\r${clear_line}%s\n" "${target_dir}"
         cd "$target_dir"
     fi
     return "$retcode"
