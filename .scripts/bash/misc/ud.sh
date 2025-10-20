@@ -140,14 +140,14 @@ __pd_or_err__() {
 
 __pd_widget__() {
     local clear_line=$(tput el) # Clear line from cursor to end
-    local selector ret retcode selected error
+    local navigator ret retcode selected error
     if command -v pd >/dev/null; then
         # https://github.com/shaobosong/pd
-        selector="$(command -v pd)"
+        navigator="$(command -v pd)"
     else
-        selector="__pd_or_err__"
+        navigator="__pd_or_err__"
     fi
-    ret="$(${selector})"; retcode=$?
+    ret="$(${navigator})"; retcode=$?
     printf "\r${clear_line}"
     if test "$retcode" -eq 0; then
         selected="$ret"
@@ -159,14 +159,14 @@ __pd_widget__() {
 
 ud() {
     local clear_line=$(tput el) # Clear line from cursor to end
-    local selector ret retcode target_dir error
+    local navigator ret retcode target_dir error
     if command -v pd >/dev/null; then
         # https://github.com/shaobosong/pd
-        selector="$(command -v pd)"
+        navigator="$(command -v pd)"
     else
-        selector="__pd_or_err__"
+        navigator="__pd_or_err__"
     fi
-    ret="$(${selector})"; retcode=$?
+    ret="$(${navigator})"; retcode=$?
     if test "$retcode" -ne 0; then
         error="$ret"
         test -n "$error" &&
