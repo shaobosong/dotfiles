@@ -7,20 +7,17 @@
 #
 # Usage:
 #   1. Add a source to "ud.sh" in ~/.bashrc
-#   2. (Optional) Set keymap before sourcing: export UD_KEYMAP="emacs"
+#   2. (Optional) Set keymap before sourcing: export PD_KEYMAP="emacs"
 #   3. Run `source ~/.bashrc` or open a new terminal
 #   4. Type `ud` in any nested directory
 #
 # Configuration:
-#   - UD_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
+#   - PD_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
 #
 
-__ud_select_or_error__() {
+__pd_or_err__() {
     # Set default keymap if not configured by the user
-    : "${UD_KEYMAP:=vim}"
-
-    # Exit if in root directory
-    [[ "$PWD" == "/" ]] && echo "ud: already at root directory." && return 1
+    : "${PD_KEYMAP:=vim}"
 
     # ANSI escape codes for TUI rendering
     local HL_START=$({ tput smso >/dev/null 2>&1 && tput smso; } || { tput setaf 3 >/dev/null 2>&1 && tput setaf 3; } || echo '**') # Highlight start (standout mode)
@@ -112,7 +109,7 @@ __ud_select_or_error__() {
             fi
 
             # Key dispatcher based on the configured keymap
-            if [[ "$UD_KEYMAP" == "emacs" ]]; then
+            if [[ "$PD_KEYMAP" == "emacs" ]]; then
                 case "$key" in
                     $'\x02' | $'\x1b[D' | $'\x1bb') _move_left ;;  # C-b, Left Arrow, Alt-b
                     $'\x06' | $'\x1b[C' | $'\x1bf') _move_right ;; # C-f, Right Arrow, Alt-f
@@ -133,7 +130,7 @@ __ud_select_or_error__() {
             case "$key" in
                 # FIXME: Tab key triggering issue
                 '') _new_dir; return 0 ;; # Enter, C-m, C-j
-                'q' | $'\x1b') echo "ud: exit" && return 1 ;; # q, or ESC
+                'q' | $'\x1b') return 1 ;; # q, or ESC
             esac
         done
     }
@@ -141,10 +138,16 @@ __ud_select_or_error__() {
     _loop
 }
 
-__ud_dir_widget__() {
+__pd_widget__() {
     local clear_line=$(tput el) # Clear line from cursor to end
-    local ret retcode selected error
-    ret="$(__ud_select_or_error__)"; retcode=$?
+    local selector ret retcode selected error
+    if command -v pd; then
+        # https://github.com/shaobosong/pd
+        selector="$(command -v pd)"
+    else
+        selector="__pd_or_err__"
+    fi
+    ret="$(${selector})"; retcode=$?
     printf "\r${clear_line}"
     if test "$retcode" -eq 0; then
         selected="$ret"
@@ -156,16 +159,22 @@ __ud_dir_widget__() {
 
 ud() {
     local clear_line=$(tput el) # Clear line from cursor to end
-    local ret retcode target_dir error
-    ret="$(__ud_select_or_error__)"; retcode=$?
+    local selector ret retcode target_dir error
+    if command -v pd; then
+        # https://github.com/shaobosong/pd
+        selector="$(command -v pd)"
+    else
+        selector="__pd_or_err__"
+    fi
+    ret="$(${selector})"; retcode=$?
     if test "$retcode" -ne 0; then
         error="$ret"
         test -n "$error" &&
-            printf "\r${error}${clear_line}\n" ||
+            printf "\r${clear_line}${error}" ||
             printf "\r${clear_line}"
     else
         target_dir="$ret"
-        printf "\r${target_dir}${clear_line}\n"
+        printf "\r${clear_line}${target_dir}\n"
         cd "$target_dir"
     fi
     return "$retcode"
@@ -175,8 +184,8 @@ if (( BASH_VERSINFO[0] < 4 )); then
     # TODO: Compatible with lower 'bash' version
     false
 else
-    bind -m emacs-standard -x '"\eh": __ud_dir_widget__'
-    bind -m vi-command -x '"\eh": __ud_dir_widget__'
-    bind -m vi-insert -x '"\eh": __ud_dir_widget__'
+    bind -m emacs-standard -x '"\eh": __pd_widget__'
+    bind -m vi-command -x '"\eh": __pd_widget__'
+    bind -m vi-insert -x '"\eh": __pd_widget__'
     :
 fi
