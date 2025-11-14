@@ -32,11 +32,17 @@ local dir = {
     lazy = true,
     cmd = { "Cdup" },
     keys = {
-      { "<leader>cu", "<cmd>Cdup<cr>", mode = "" },
+      { "<leader>ud", "<cmd>Cdup<cr>", mode = "" },
     },
     config = function ()
       -- Default configuration
       local default_config = {
+        -- Resolve a valid directory path
+        resolve_dir = function ()
+          local path = vim.fn.expand("%:p:h")
+          path = vim.fn.isdirectory(path) == 1 and path or vim.fn.getcwd()
+          return path
+        end,
         -- Highlight group for the selected directory name.
         -- Good options: 'TermCursor', 'Visual', 'IncSearch', 'Search'
         highlight_group = 'TermCursor',
