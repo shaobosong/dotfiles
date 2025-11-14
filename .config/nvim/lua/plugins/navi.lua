@@ -504,6 +504,7 @@ local finder = {
       -- ast-grep search
       { "<leader>gi", "<cmd>FzfLua ast_grep_identifier<cr>", mode = "" },
       -- lsp
+      { "<leader>d",  "<cmd>FzfLua my_lsp_definitions<cr>",  mode = "" },
       { "<leader>ld", "<cmd>FzfLua my_lsp_definitions<cr>",  mode = "" },
       { "<leader>lD", "<cmd>FzfLua lsp_declarations<cr>",    mode = "" },
       { "<leader>lt", "<cmd>FzfLua my_lsp_typedefs<cr>",     mode = "" },
