@@ -38,3 +38,8 @@
 
 # Remove Largest Prefix Pattern.
 : ${VAR##word}
+
+: ${string//pattern/replacement}：替换所有匹配的模式。
+: ${string/pattern/replacement}：替换第一个匹配的模式。
+: ${string/#pattern/replacement}：替换开头的匹配模式。
+: ${string/%pattern/replacement}：替换结尾的匹配模式。

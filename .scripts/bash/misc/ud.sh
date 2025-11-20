@@ -26,7 +26,7 @@ __pd_or_err__() {
     local CURSOR_SHOW=$(tput cnorm) # Show cursor
 
     # Split path into an array: /a/b/c -> (a b c)
-    local path_parts=(${PWD//\// })
+    local path_parts=(${PWD//\//\/ })
     local num_parts=${#path_parts[@]}
     local current_index=$((num_parts - 1))
     local cnt_act=""
@@ -75,7 +75,7 @@ __pd_or_err__() {
         # Build the target path from the selected index
         local target_dir=""
         for i in $(seq 0 $current_index); do
-            target_dir+="/${path_parts[i]}"
+            target_dir+="${path_parts[i]}"
         done
         echo "${target_dir}"
     }
@@ -85,9 +85,9 @@ __pd_or_err__() {
         local display_path=""
         for i in "${!path_parts[@]}"; do
             if [[ $i -eq $current_index ]]; then
-                display_path+="/${HL_START}${path_parts[i]}${HL_END}"
+                display_path+="${HL_START}${path_parts[i]}${HL_END}"
             else
-                display_path+="/${path_parts[i]}"
+                display_path+="${path_parts[i]}"
             fi
         done
         # \r moves cursor to line start, then we print and clear extra chars
