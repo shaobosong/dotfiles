@@ -490,6 +490,7 @@ local finder = {
       -- "echasnovski/mini.icons",
       {
         'junegunn/fzf',
+        tag = 'v0.67.0',
         build = './install --bin',
       },
     },
