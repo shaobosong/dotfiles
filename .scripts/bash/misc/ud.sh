@@ -184,8 +184,8 @@ if (( BASH_VERSINFO[0] < 4 )); then
     # TODO: Compatible with lower 'bash' version
     false
 else
-    bind -m emacs-standard -x '"\eh": __pd_widget__'
-    bind -m vi-command -x '"\eh": __pd_widget__'
-    bind -m vi-insert -x '"\eh": __pd_widget__'
+    bind -m emacs-standard -x '"\ep": __pd_widget__'
+    bind -m vi-command -x '"\ep": __pd_widget__'
+    bind -m vi-insert -x '"\ep": __pd_widget__'
     :
 fi
