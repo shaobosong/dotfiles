@@ -79,6 +79,23 @@ __pd_or_err__() {
         done
         echo "${target_dir}"
     }
+    _yank() {
+        local target_dir=""
+        local clipboard_cmd=""
+        if [ -n "$TMUX" ]; then
+            clipboard_cmd='tmux load-buffer -w -'
+        elif command -v wl-copy >/dev/null 2>&1; then
+            clipboard_cmd='wl-copy'
+        elif command -v xclip >/dev/null 2>&1; then
+            clipboard_cmd='xclip -selection clipboard'
+        elif command -v pbcopy >/dev/null 2>&1; then
+            clipboard_cmd='pbcopy'
+        fi
+        for i in $(seq 0 $current_index); do
+            target_dir+="${path_parts[i]}"
+        done
+        printf "${target_dir}" | eval "$clipboard_cmd"
+    }
 
     # Renders the interactive path string
     _render() {
@@ -115,6 +132,7 @@ __pd_or_err__() {
                     $'\x06' | $'\x1b[C' | $'\x1bf') _move_right ;; # C-f, Right Arrow, Alt-f
                     $'\x01' | $'\x1b[H' | $'\x1b[1') _move_start ;; # C-a, Home
                     $'\x05' | $'\x1b[F' | $'\x1b[4') _move_end ;;   # C-e, End
+                    $'\x15') _yank; return 2 ;;
                 esac
             else # Default to "vim" keymap
                 case "$key" in
@@ -125,6 +143,7 @@ __pd_or_err__() {
                     'M') _move_middle ;;
                     ';') _move_last ;; # ;
                     [0-9]) _move_count "$key" ;;
+                    'y') _yank; return 2 ;;
                 esac
             fi
             case "$key" in
