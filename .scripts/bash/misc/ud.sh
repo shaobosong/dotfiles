@@ -90,6 +90,8 @@ __pd_or_err__() {
             clipboard_cmd='xclip -selection clipboard'
         elif command -v pbcopy >/dev/null 2>&1; then
             clipboard_cmd='pbcopy'
+        elif command -v putclip >/dev/null 2>&1; then
+            clipboard_cmd='putclip'
         fi
         for i in $(seq 0 $current_index); do
             target_dir+="${path_parts[i]}"
