@@ -77,7 +77,7 @@ local code = {
     },
     lazy = true,
     keys = {
-      { "<leader>i", "<cmd>AerialToggle<cr>", mode = "" }, -- 'i' means 'identifiers'
+      { "gt", "<cmd>AerialToggle<cr>", mode = "" }, -- 'i' means 'identifiers'
       { "[[", "<cmd>AerialPrev<cr>",   mode = "" },
       { "]]", "<cmd>AerialNext<cr>",   mode = "" },
     },
