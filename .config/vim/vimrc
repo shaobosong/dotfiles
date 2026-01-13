@@ -40,10 +40,15 @@ function! s:syntax_c3()
       \ cast asm null true false
 endfunction
 
+function! s:syntax_sh()
+    syntax sync ccomment shComment minlines=1
+endfunction
+
 augroup custom_syntax
     autocmd!
     autocmd FileType c,cpp call s:syntax_c()
     autocmd FileType c3 call s:syntax_c3()
+    autocmd FileType sh call s:syntax_sh()
 augroup END
 
 set hls
@@ -65,11 +70,24 @@ set ignorecase
 set smartcase
 set hidden
 set path+=**
+set list listchars=tab:>·,trail:█,extends:>,precedes:<
+set mouse=a
+set mousemodel=popup
+
+aunmenu PopUp
+anoremenu PopUp.Copy "+yiw
+vnoremenu PopUp.Copy "+y
+anoremenu PopUp.Cut "+diw
+vnoremenu PopUp.Cut "+x
+anoremenu PopUp.Paste "+gP
+vnoremenu PopUp.Paste "+P
+vnoremenu PopUp.Delete "_x
 
 noremap <silent> <ESC>L <C-W>l
 noremap <silent> <ESC>H <C-W>h
 noremap <silent> <ESC>J <C-W>j
 noremap <silent> <ESC>K <C-W>k
+noremap <silent> <SPACE>m <CMD>popup PopUp<CR>
 noremap! <silent> <ESC>L <ESC><C-W>l
 noremap! <silent> <ESC>H <ESC><C-W>h
 noremap! <silent> <ESC>J <ESC><C-W>j
