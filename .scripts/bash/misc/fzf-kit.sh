@@ -66,7 +66,7 @@ _check_commands() {
     fi
 
     if command -v rg &> /dev/null; then
-        GREP_CMD="rg --line-number --color=always --no-heading --follow --no-binary --no-config"
+        GREP_CMD="rg --line-number --color=always --no-heading --follow --no-binary --no-config --smart-case"
         GREP_HIDDEN_OPT="--hidden"
         GREP_IGNORE_OPT="--no-ignore"
         GREP_FLAG_HIDDEN="(+hidden)"
