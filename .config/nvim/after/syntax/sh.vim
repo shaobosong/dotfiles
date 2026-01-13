@@ -1,1 +1,1 @@
-syntax sync ccomment shComment minlines=50
+syntax sync ccomment shComment minlines=1

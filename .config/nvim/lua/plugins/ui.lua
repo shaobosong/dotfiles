@@ -159,8 +159,11 @@ local theme = {
           -- hl.DiffDelete = { fg = "", bg = "#421E1E" }
 
           hl.DiffAdd = { fg = "", bg = "#12261E" }
-          hl.DiffChange = { fg = "", bg = "#121726" }
+          hl.DiffChange = { fg = "", bg = "#1A2137" }
           hl.DiffDelete = { fg = "", bg = "#25171C" }
+          hl.DiffText = { fg = "", bg = "#0C2D6B" }
+
+          hl.Folded = { fg = "#C38000", bg = "#5D4C2B" }
 
           hl.WinSeparator = { bg = "", fg = "#626262" }
           hl.CursorLineNr = { bg = "", fg = "#FF9E64" }
@@ -229,11 +232,13 @@ local focus = {
   },
 }
 
-local git = {
+local vcs = {
   -- { "mhinz/vim-signify" },
   -- { "airblade/vim-gitgutter" },
   {
+    -- dir = '/root/freedom/gitsigns.nvim',
     "lewis6991/gitsigns.nvim",
+    tag = "v2.0.0",
     config = function()
       require("gitsigns").setup({
         signs                   = {
@@ -252,16 +257,30 @@ local git = {
           changedelete = { text = '┃' },
           untracked    = { text = '┆' },
         },
+        signs_staged_enable     = true,
         signcolumn              = true,
         numhl                   = false,
         linehl                  = false,
         word_diff               = false,
+        watch_gitdir = {
+          enable = true,
+          follow_files = true,
+        },
+        auto_attach = true,
         attach_to_untracked     = true,
         current_line_blame      = true,
         current_line_blame_opts = {
           delay = 300,
         },
-        on_attach               = function(bufnr)
+        max_file_length = 40000,
+        preview_config = {
+          -- Options passed to nvim_open_win
+          style = 'minimal',
+          relative = 'cursor',
+          row = 0,
+          col = 1
+        },
+        on_attach = function(bufnr)
           local gitsigns = require('gitsigns')
           local function map(mode, l, r, opts)
             opts = opts or {}
@@ -286,21 +305,21 @@ local git = {
             end
           end)
 
-          map('n', ']C', function()
-            if vim.wo.diff then
-              vim.cmd.normal({ ']c', bang = true })
-            else
-              gitsigns.nav_hunk('next', { target = 'staged' })
-            end
-          end)
+          -- map('n', ']C', function()
+          --   if vim.wo.diff then
+          --     vim.cmd.({ ']c', bang = true })
+          --   else
+          --     gitsigns.nav_hunk('next', { target = 'staged' })
+          --   end
+          -- end)
 
-          map('n', '[C', function()
-            if vim.wo.diff then
-              vim.cmd.normal({ '[c', bang = true })
-            else
-              gitsigns.nav_hunk('prev', { target = 'staged' })
-            end
-          end)
+          -- map('n', '[C', function()
+          --   if vim.wo.diff then
+          --     vim.cmd.normal({ '[c', bang = true })
+          --   else
+          --     gitsigns.nav_hunk('prev', { target = 'staged' })
+          --   end
+          -- end)
 
           -- Actions
           map('n', '<leader>hs', gitsigns.stage_hunk)
@@ -312,11 +331,28 @@ local git = {
           map('v', '<leader>hr', function()
             gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
           end)
+
+          map('n', '<leader>hS', gitsigns.stage_buffer)
           map('n', '<leader>hR', gitsigns.reset_buffer)
+          map('n', '<leader>hp', gitsigns.preview_hunk)
+          map('n', '<leader>hi', gitsigns.preview_hunk_inline)
+
+          map('n', '<leader>hb', function()
+            gitsigns.blame_line({ full = true })
+          end)
+
+          map('n', '<leader>hd', gitsigns.diffthis)
+
+          map('n', '<leader>hD', function()
+            gitsigns.diffthis('~')
+          end)
+
+          map('n', '<leader>hq', gitsigns.setqflist)
+          map('n', '<leader>hQ', function() gitsigns.setqflist('all') end)
 
           -- Toggles
           map('n', '<leader>ht', function()
-            gitsigns.toggle_linehl()
+            -- gitsigns.toggle_linehl()
             -- topdelete issue: lewis6991/gitsigns.nvim#566
             gitsigns.toggle_deleted()
             gitsigns.toggle_word_diff()
@@ -341,13 +377,13 @@ local git = {
       vim.api.nvim_set_hl(0, 'GitSignsTopdeleteNr', { link = 'GitSignsDelete' })
       vim.api.nvim_set_hl(0, 'GitSignsUntrackedNr', { link = 'GitSignsAdd' })
 
-      vim.api.nvim_set_hl(0, 'GitSignsAddLn', { fg = "", bg = "#12261E" })
-      vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { fg = "", bg = "#121726" })
+      vim.api.nvim_set_hl(0, 'GitSignsAddLn', { link = 'DiffAdd' })
+      vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { link = 'DiffChange' })
       vim.api.nvim_set_hl(0, 'GitSignsDeleteLn', { fg = "", bg = "" })
       vim.api.nvim_set_hl(0, 'GitSignsChangedeleteLn', { link = 'GitSignsChangeLn' })
       vim.api.nvim_set_hl(0, 'GitSignsTopdeleteLn', { link = 'GitSignsDeleteLn' })
       vim.api.nvim_set_hl(0, 'GitSignsUntrackedLn', { link = 'GitSignsAddLn' })
-      vim.api.nvim_set_hl(0, 'GitSignsDeleteVirtLn', { fg = "#626262", bg = "#25171C" })
+      vim.api.nvim_set_hl(0, 'GitSignsDeleteVirtLn', { link = 'DiffDelete' })
 
       vim.api.nvim_set_hl(0, 'GitSignsStagedAdd', { fg = "#0a5010", bg = "" })
       vim.api.nvim_set_hl(0, 'GitSignsStagedChange', { fg = "#003080", bg = "" })
@@ -365,8 +401,8 @@ local git = {
       vim.api.nvim_set_hl(0, 'GitSignsDeleteLnInline', { link = 'GitSignsDeleteInline' })
       vim.api.nvim_set_hl(0, 'GitSignsDeleteVirtLnInline', { fg = "#626262", bg = "#542426" })
 
-      vim.api.nvim_set_hl(0, 'GitSignsAddPreview', { fg = "", bg = "#12261E" })
-      vim.api.nvim_set_hl(0, 'GitSignsDeletePreview', { fg = "", bg = "#25171C" })
+      vim.api.nvim_set_hl(0, 'GitSignsAddPreview', { link = 'DiffAdd' })
+      vim.api.nvim_set_hl(0, 'GitSignsDeletePreview', { link = 'DiffDelete' })
     end
   },
 }
@@ -387,9 +423,79 @@ local lsp = {
   },
 }
 
+local cursor = {
+  {
+    url = 'git@github.com:jake-stewart/multicursor.nvim.git',
+    branch = "1.0",
+    config = function()
+      local mc = require("multicursor-nvim")
+      mc.setup()
+
+      local set = vim.keymap.set
+
+      -- Add or skip cursor above/below the main cursor.
+      set({"n", "x"}, "<ESC><C-K>", function() mc.lineAddCursor(-1) end)
+      set({"n", "x"}, "<ESC><C-J>", function() mc.lineAddCursor(1) end)
+      set({"n", "x"}, "<c-up>", function() mc.lineSkipCursor(-1) end)
+      set({"n", "x"}, "<c-down>", function() mc.lineSkipCursor(1) end)
+
+      -- Add or skip adding a new cursor by matching word/selection
+      set({"n", "x"}, "<leader>n", function() mc.matchAddCursor(1) end)
+      set({"n", "x"}, "<leader>s", function() mc.matchSkipCursor(1) end)
+      set({"n", "x"}, "<leader>N", function() mc.matchAddCursor(-1) end)
+      set({"n", "x"}, "<leader>S", function() mc.matchSkipCursor(-1) end)
+
+      -- Add and remove cursors with control + left click.
+      set("n", "<c-leftmouse>", mc.handleMouse)
+      set("n", "<c-leftdrag>", mc.handleMouseDrag)
+      set("n", "<c-leftrelease>", mc.handleMouseRelease)
+
+      -- match new cursors within visual selections by regex.
+      set("x", "<leader>/", mc.matchCursors)
+
+      -- Disable and enable cursors.
+      set({"n", "x"}, "<c-q>", mc.toggleCursor)
+
+      -- Mappings defined in a keymap layer only apply when there are
+      -- multiple cursors. This lets you have overlapping mappings.
+      mc.addKeymapLayer(function(layerSet)
+
+        -- Select a different cursor as the main one.
+        layerSet({"n", "x"}, "<esc>N", mc.prevCursor)
+        layerSet({"n", "x"}, "<esc>n", mc.nextCursor)
+
+        -- Delete the main cursor.
+        layerSet({"n", "x"}, "<leader>x", mc.deleteCursor)
+
+        -- Enable and clear cursors using escape.
+        layerSet("n", "<M-l>", function()
+          if not mc.cursorsEnabled() then
+            mc.enableCursors()
+          elseif mc.hasCursors() then
+            mc.clearCursors()
+          else
+            -- default <esc> handler
+          end
+        end)
+      end)
+
+      -- Customize how cursors look.
+      local hl = vim.api.nvim_set_hl
+      hl(0, "MultiCursorCursor", { reverse = true })
+      hl(0, "MultiCursorVisual", { link = "Visual" })
+      hl(0, "MultiCursorSign", { link = "SignColumn"})
+      hl(0, "MultiCursorMatchPreview", { link = "Search" })
+      hl(0, "MultiCursorDisabledCursor", { reverse = true })
+      hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
+      hl(0, "MultiCursorDisabledSign", { link = "SignColumn"})
+    end
+  },
+}
+
 return {
   theme,
   focus,
-  git,
+  vcs,
   lsp,
+  cursor,
 }

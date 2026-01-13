@@ -13,7 +13,7 @@ return {
       nvim_treesitter.install {
         'c', 'cpp', 'c3',
         'lua',
-        'python',
+        -- 'python',
         'rust',
         'zig',
       }

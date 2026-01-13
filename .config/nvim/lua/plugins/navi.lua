@@ -5,6 +5,12 @@ local file = {
     lazy = false,
     config = function()
       require('oil').setup {
+        columns = {
+          -- "icon",
+          "permissions",
+          "size",
+          "mtime",
+        },
         view_options = {
           show_hidden = true,
         }
@@ -77,17 +83,18 @@ local code = {
     },
     lazy = true,
     keys = {
-      { "gt", "<cmd>AerialToggle<cr>", mode = "" }, -- 'i' means 'identifiers'
+      { "gt", "<cmd>AerialToggle<cr>", mode = "" },
       { "[[", "<cmd>AerialPrev<cr>",   mode = "" },
       { "]]", "<cmd>AerialNext<cr>",   mode = "" },
     },
     config = function()
       require("aerial").setup({
         backends = {
-          ['_'] = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
+          ['_'] = { "treesitter", "lsp", "markdown", "asciidoc", "man" },
           c = { "lsp" },
           c3 = { "treesitter" },
           zig = { "treesitter" },
+          lua = { "treesitter" }
         },
 
         layout = {
@@ -214,8 +221,20 @@ local code = {
             "Variable",
           },
           c = {
+            "Enum",
+            -- "EnumMember",
             -- "Field",
             "Function",
+            "Method",
+            "Struct",
+            "Variable",
+          },
+          cpp = {
+            "Enum",
+            -- "EnumMember",
+            -- "Field",
+            "Function",
+            "Method",
             "Struct",
             "Variable",
           },
@@ -223,6 +242,7 @@ local code = {
             "Array",
             "Object",
             "Function",
+            "Variable",
           },
         },
 
@@ -505,6 +525,7 @@ local finder = {
       -- ast-grep search
       { "<leader>gi", "<cmd>FzfLua ast_grep_identifier<cr>", mode = "" },
       -- lsp
+      { "gl",         "<cmd>FzfLua my_lsp_definitions<cr>",  mode = "" },
       { "<leader>d",  "<cmd>FzfLua my_lsp_definitions<cr>",  mode = "" },
       { "<leader>ld", "<cmd>FzfLua my_lsp_definitions<cr>",  mode = "" },
       { "<leader>lD", "<cmd>FzfLua lsp_declarations<cr>",    mode = "" },
@@ -549,6 +570,7 @@ local finder = {
         },
         actions  = {
           files = {
+            ["esc"]    = fzf_actions.dummy_abort,
             ["enter"]  = fzf_actions.file_edit_or_qf,
             ["ctrl-s"] = fzf_actions.file_split,
             ["ctrl-v"] = fzf_actions.file_vsplit,
@@ -625,6 +647,7 @@ local finder = {
           file_icons = false,
           color_icons = false,
           actions = {
+            ["esc"]    = fzf_actions.dummy_abort,
             ["enter"]  = fzf_actions.file_edit_or_qf,
             ["ctrl-s"] = fzf_actions.file_split,
             ["ctrl-v"] = fzf_actions.file_vsplit,

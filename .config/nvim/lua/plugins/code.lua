@@ -2,6 +2,7 @@ local mason = {
   {
     "mason-org/mason.nvim",
     config = function()
+      -- require("mason.health").check()
       require("mason").setup()
     end,
   },
@@ -111,14 +112,14 @@ local completer = {
               end
             end,
           },
-          ['<ESC>l'] = {
-            i = function()
-              -- if cmp.visible() then
-              --     cmp.close()
-              -- end
-              vim.api.nvim_input('<Esc><Esc>')
-            end
-          },
+          -- ['<ESC>l'] = {
+          --   i = function()
+          --     -- if cmp.visible() then
+          --     --     cmp.close()
+          --     -- end
+          --     vim.api.nvim_input('<Esc><Esc>')
+          --   end
+          -- },
           ['<Tab>'] = cmp.mapping(function(fallback)
             -- For native neovim snippets (Neovim v0.10+)
             if vim.snippet.active({ direction = 1 }) then

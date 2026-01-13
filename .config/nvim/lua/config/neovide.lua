@@ -1,4 +1,6 @@
 -- variable
+vim.o.guifont = "Cascadia Code:h12"
+-- vim.g.neovide_scale_factor = 0.95
 vim.g.neovide_opacity = 0.95
 
 vim.g.neovide_floating_blur_amount_x = 0

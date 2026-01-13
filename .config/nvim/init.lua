@@ -1,3 +1,4 @@
+-- vim.g.clipboard = "osc52"
 -- vim options
 require("config.option")
 -- vim variables
