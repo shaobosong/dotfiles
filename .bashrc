@@ -130,6 +130,10 @@ alias curls5='\curl -x socks5h://$(\awk '\''$2 == "00000000" {print strtonum("0x
 alias fe='fzf --bind="enter:become(nvim {})"'
 
 # exports
+export XDG_CONFIG_HOME=$HOME/.config
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_DATA_HOME=$HOME/.local/share
+export XDG_STATE_HOME=$HOME/.local/state
 export EDITOR=/usr/bin/nano
 export PROMPT_COMMAND="history -a; #history -n"
 export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first,alt-enter:accept --color=dark"
