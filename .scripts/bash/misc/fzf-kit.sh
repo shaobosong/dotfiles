@@ -120,6 +120,24 @@ _check_commands() {
     fi
 }
 
+_fzf_process_action() {
+    local ps_cmd="ps -eo pid,comm,%cpu,%mem --sort=-%cpu"
+    local fzf_prompt="Process> "
+    local ghost_text="<ctrl-k>: Kill | <ctrl-t>: Tree | <ctrl-r>: Refresh"
+
+    ${ps_cmd} | ${FZF_CMD} \
+        --header="${ps_cmd}" \
+        --prompt="${fzf_prompt}" \
+        --ghost="${ghost_text}" \
+        --preview="echo 'PID: {1} | Command: {2} | CPU: {3}% | MEM: {4}%'" \
+        --preview-window='down:3' \
+        --bind "ctrl-k:execute(kill -9 {1})+reload(${ps_cmd})" \
+        --bind "ctrl-t:execute(pstree -p {1} | less)" \
+        --bind "ctrl-r:reload(${ps_cmd})" \
+        --header-lines=1 \
+        --layout=reverse
+}
+
 _fzf_file_vim_action() {
     export FD_CONFIG_PATH=
 
@@ -165,6 +183,7 @@ fzf_kit() {
     fzf_actions=(
         ["file-vim"]="_fzf_file_vim_action"
         ["grep-vim"]="_fzf_grep_vim_action"
+        ["process"]="_fzf_process_action"
     )
 
     __options=$(printf "%s\n" "${!fzf_actions[@]}" | sort)
