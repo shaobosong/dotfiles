@@ -1,3 +1,6 @@
+[color]
+	diff = always
+
 [user]
 	email = shnusongshaobo@gmail.com
 	name = Shaobo Song
