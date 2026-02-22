@@ -66,6 +66,8 @@ function build () {
     configure_cmd=(
         "${ROOT}/configure"
         "--prefix=${INSTALL}"
+        "--enable-shared"
+        "--enable-static"
         "${EXTRA_CONFIG_OPTS[@]}"
     )
     eval "${configure_cmd[@]}"

@@ -12,6 +12,8 @@ INSTALL=${BUILD}/install
 PLATFORM=linux
 TYPE=debug
 TARGET=all
+CC=""
+CXX=""
 EXTRA_CONFIG_OPTS=()
 
 function panic ()
@@ -29,7 +31,9 @@ function parse_args () {
       --help                     Print this message
       --platform=<linux|mingw64> Build platform (default: linux)
       --type=<debug|release>     Build type (default: debug)
-      --target=TARGET            Build target (default: all)"
+      --target=TARGET            Build target (default: all)
+      --cc=CC                    C compiler (default: system default)
+      --cxx=CXX                  CXX compiler (default: system default)"
                 exit 0
                 ;;
             --platform=linux | --platform=mingw64)
@@ -42,6 +46,14 @@ function parse_args () {
                 ;;
             --target=*)
                 TARGET=$optarg
+                shift
+                ;;
+            --cc=*)
+                CC=$optarg
+                shift
+                ;;
+            --cxx=*)
+                CXX=$optarg
                 shift
                 ;;
             *)
@@ -87,6 +99,14 @@ function parse_args () {
     else
         echo "Failed to find build platform: '${PLATFORM}'" >&2
         exit 1
+    fi
+
+    # custom compilers (override platform defaults)
+    if test -n "${CC}"; then
+        EXTRA_CONFIG_OPTS+=("-DCMAKE_C_COMPILER=${CC}")
+    fi
+    if test -n "${CXX}"; then
+        EXTRA_CONFIG_OPTS+=("-DCMAKE_CXX_COMPILER=${CXX}")
     fi
 }
 
