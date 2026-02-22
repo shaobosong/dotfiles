@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 RUNTIME_DIR="/tmp/fzf-kit.${USER}"
+PROXY_IP=`ip r|awk 'NR==1 {print $3}'`
+PROXY_PORT="2208"
 FIND_FILES_CMD= # fd
 FIND_DIRS_CMD= # fd
 FIND_HIDDEN_OPT=
@@ -174,16 +176,27 @@ _fzf_grep_vim_action() {
         --bind "${GREP_BIND_IGNORE}"
 }
 
+_fzf_toggle_proxy_action() {
+    if [[ -n "${ALL_PROXY}" ]]; then
+        unset ALL_PROXY
+    else
+        export ALL_PROXY="socks5h://${PROXY_IP}:${PROXY_PORT}"
+    fi
+}
+
 fzf_kit() {
     _check_commands
 
     test -d ${RUNTIME_DIR} || mkdir -p ${RUNTIME_DIR}
+
+    local proxy_label="toggle-proxy (ALL_PROXY: ${ALL_PROXY-unset})"
 
     declare -A fzf_actions
     fzf_actions=(
         ["file-vim"]="_fzf_file_vim_action"
         ["grep-vim"]="_fzf_grep_vim_action"
         ["process"]="_fzf_process_action"
+        ["${proxy_label}"]="_fzf_toggle_proxy_action"
     )
 
     __options=$(printf "%s\n" "${!fzf_actions[@]}" | sort)
