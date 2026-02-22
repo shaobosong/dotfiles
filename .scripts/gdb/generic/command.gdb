@@ -15,7 +15,7 @@ define tstepi
         stepi
         set schedule-multiple on
     else
-        si
+        stepi
     end
 end
 
@@ -32,7 +32,7 @@ define tnexti
         nexti
         set schedule-multiple on
     else
-        si
+        nexti
     end
 end
 
@@ -49,7 +49,7 @@ define tstep
         step
         set schedule-multiple on
     else
-        si
+        step
     end
 end
 
@@ -66,7 +66,7 @@ define tnext
         next
         set schedule-multiple on
     else
-        si
+        next
     end
 end
 
