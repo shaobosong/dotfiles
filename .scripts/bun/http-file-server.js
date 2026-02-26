@@ -251,14 +251,14 @@ function createDirectoryHtml(urlPath, items) {
   const rows = sorted
     .map((item) => {
       const actionLinks = [];
+      const nameHref = item.isDirectory ? item.href : (item.downloadHref || item.href);
       if (item.previewHref) actionLinks.push(`<a class="preview-link" href="${item.previewHref}">preview</a>`);
-      if (item.downloadHref) actionLinks.push(`<a href="${item.downloadHref}">download</a>`);
       if (item.viewHref) actionLinks.push(`<a href="${item.viewHref}">view</a>`);
       const action = actionLinks.length > 0
         ? `<span class="action-links">${actionLinks.join('<span class="sep muted">|</span>')}</span>`
         : '<span class="muted">-</span>';
       return `<tr data-group="${item.groupSort}" data-preview-kind="${item.previewKind}" data-preview-url="${escapeHtml(item.previewHref || "")}" data-name="${escapeHtml(item.name)}" data-size-label="${escapeHtml(item.sizeLabel)}" data-modified-label="${escapeHtml(item.modifiedLabel)}" data-mime="${escapeHtml(item.mime || "")}">
-  <td class="name" data-sort="${escapeHtml(item.sortName)}"><a class="name-link" href="${item.href}">${renderNameIcon(item.isDirectory)}<span class="name-text">${escapeHtml(item.name)}</span></a></td>
+  <td class="name" data-sort="${escapeHtml(item.sortName)}"><a class="name-link" href="${escapeHtml(nameHref)}">${renderNameIcon(item.isDirectory)}<span class="name-text">${escapeHtml(item.name)}</span></a></td>
   <td class="size" data-sort="${item.sizeSort}">${escapeHtml(item.sizeLabel)}</td>
   <td class="modified" data-sort="${item.modifiedSort}">${escapeHtml(item.modifiedLabel)}</td>
   <td class="action">${action}</td>
@@ -341,6 +341,16 @@ function createDirectoryHtml(urlPath, items) {
     .preview-textbox { width: 100%; min-height: 0; height: 100%; flex: 1 1 auto; margin: 0; padding: 0.6rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--fg); font-size: 0.84rem; line-height: 1.45; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; resize: none; }
     .preview-textbox:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.22); }
     .preview-image { display: block; max-width: 100%; height: auto; border-radius: 8px; background: #f8fafc; }
+    .preview-image.zoomable { cursor: zoom-in; }
+    .preview-image-zoom { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(15, 23, 42, 0.78); }
+    .preview-image-zoom[hidden] { display: none; }
+    .preview-image-zoom-viewport { max-width: calc(100vw - 2rem); max-height: calc(100vh - 2rem); overflow: auto; border-radius: 10px; cursor: default; scrollbar-width: none; -ms-overflow-style: none; }
+    .preview-image-zoom-viewport::-webkit-scrollbar { width: 0; height: 0; display: none; }
+    .preview-image-zoom-viewport.draggable { cursor: grab; }
+    .preview-image-zoom-viewport.dragging { cursor: grabbing; user-select: none; }
+    .preview-image-zoom-media { display: block; max-width: none; max-height: none; border-radius: 10px; background: #fff; box-shadow: 0 20px 56px rgba(15, 23, 42, 0.45); user-select: none; -webkit-user-drag: none; }
+    .preview-image-zoom-close { position: absolute; top: 1rem; right: 1rem; appearance: none; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 999px; background: rgba(2, 6, 23, 0.62); color: #fff; width: 2rem; height: 2rem; padding: 0; font: inherit; font-size: 1.2rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .preview-image-zoom-close:hover { background: rgba(2, 6, 23, 0.78); }
     .preview-note { margin: 0.55rem 0 0; color: var(--muted); font-size: 0.8rem; }
     .sort-btn { appearance: none; border: none; background: transparent; color: inherit; font: inherit; font-weight: inherit; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 0.25rem; }
     .sort-btn::after {
@@ -402,7 +412,7 @@ function createDirectoryHtml(urlPath, items) {
             <th class="name"><button type="button" class="sort-btn" data-key="name">Name</button></th>
             <th class="size"><button type="button" class="sort-btn" data-key="size">Size</button></th>
             <th class="modified"><button type="button" class="sort-btn" data-key="modified">Modified</button></th>
-            <th class="action">Action</th>
+            <th class="action">Operations</th>
           </tr>
         </thead>
         <tbody>${parent}${rows}</tbody>
@@ -419,9 +429,15 @@ function createDirectoryHtml(urlPath, items) {
     </div>
     <div id="previewMeta" class="preview-meta">No file selected</div>
     <div id="previewBody" class="preview-body">
-      <p class="preview-empty">Click preview in Action to open this floating panel.</p>
+      <p class="preview-empty">Click preview in Operations to open this floating panel.</p>
     </div>
   </aside>
+  <div id="previewImageZoom" class="preview-image-zoom" aria-hidden="true" hidden>
+    <button id="previewImageZoomClose" type="button" class="preview-image-zoom-close" aria-label="Close image zoom" title="Close image zoom">&times;</button>
+    <div id="previewImageZoomViewport" class="preview-image-zoom-viewport">
+      <img id="previewImageZoomImg" class="preview-image-zoom-media" alt="" draggable="false">
+    </div>
+  </div>
   <script>
     (() => {
       const table = document.getElementById("fileTable");
@@ -437,6 +453,10 @@ function createDirectoryHtml(urlPath, items) {
       const previewBody = document.getElementById("previewBody");
       const previewCopy = document.getElementById("previewCopy");
       const previewClose = document.getElementById("previewClose");
+      const previewImageZoom = document.getElementById("previewImageZoom");
+      const previewImageZoomViewport = document.getElementById("previewImageZoomViewport");
+      const previewImageZoomImg = document.getElementById("previewImageZoomImg");
+      const previewImageZoomClose = document.getElementById("previewImageZoomClose");
       const sortButtons = Array.from(document.querySelectorAll(".sort-btn"));
       const sortKeys = new Set(["name", "size", "modified"]);
       const sortStorageKey = "http-file-server:sort:" + location.pathname;
@@ -450,6 +470,17 @@ function createDirectoryHtml(urlPath, items) {
       let activePreviewAbort = null;
       let previewCopyText = "";
       let previewCopyFeedbackTimer = null;
+      let imageZoomScale = 1;
+      let imageZoomNaturalWidth = 0;
+      let imageZoomNaturalHeight = 0;
+      let imageZoomDragging = false;
+      let imageZoomPointerId = -1;
+      let imageZoomDragStartX = 0;
+      let imageZoomDragStartY = 0;
+      let imageZoomStartScrollLeft = 0;
+      let imageZoomStartScrollTop = 0;
+      const IMAGE_ZOOM_MIN = 0.2;
+      const IMAGE_ZOOM_MAX = 8;
       const COPY_ICON_DEFAULT = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="5" y="5" width="8" height="8" rx="1.4"></rect><path d="M3 10V3.8C3 3.36 3.36 3 3.8 3H10"></path></svg>';
       const COPY_ICON_COPIED = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.5l2.4 2.4 7-7"></path></svg>';
       const COPY_ICON_FAILED = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5.7"></circle><path d="M8 5.1v3.6"></path><path d="M8 11.3h.01"></path></svg>';
@@ -561,6 +592,100 @@ function createDirectoryHtml(urlPath, items) {
         previewDrawer.setAttribute("aria-hidden", open ? "false" : "true");
       }
 
+      function isImageZoomOpen() {
+        return previewImageZoom instanceof HTMLElement && !previewImageZoom.hidden;
+      }
+
+      function clampImageZoomScale(scale) {
+        return Math.min(IMAGE_ZOOM_MAX, Math.max(IMAGE_ZOOM_MIN, scale));
+      }
+
+      function canDragZoomImage() {
+        if (!(previewImageZoomViewport instanceof HTMLElement)) return false;
+        return (
+          previewImageZoomViewport.scrollWidth > previewImageZoomViewport.clientWidth + 1 ||
+          previewImageZoomViewport.scrollHeight > previewImageZoomViewport.clientHeight + 1
+        );
+      }
+
+      function syncImageZoomDragCursor() {
+        if (!(previewImageZoomViewport instanceof HTMLElement)) return;
+        previewImageZoomViewport.classList.toggle("draggable", canDragZoomImage());
+        if (!imageZoomDragging) {
+          previewImageZoomViewport.classList.remove("dragging");
+        }
+      }
+
+      function stopImageZoomDrag() {
+        if (!(previewImageZoomViewport instanceof HTMLElement)) return;
+        imageZoomDragging = false;
+        imageZoomPointerId = -1;
+        previewImageZoomViewport.classList.remove("dragging");
+      }
+
+      function applyImageZoom(scale) {
+        if (!(previewImageZoomImg instanceof HTMLImageElement)) return;
+        if (imageZoomNaturalWidth <= 0 || imageZoomNaturalHeight <= 0) return;
+        imageZoomScale = clampImageZoomScale(scale);
+        previewImageZoomImg.style.width = String(Math.max(1, Math.round(imageZoomNaturalWidth * imageZoomScale))) + "px";
+        previewImageZoomImg.style.height = String(Math.max(1, Math.round(imageZoomNaturalHeight * imageZoomScale))) + "px";
+        syncImageZoomDragCursor();
+      }
+
+      function fitImageZoomToViewport() {
+        if (!(previewImageZoomViewport instanceof HTMLElement)) return;
+        if (imageZoomNaturalWidth <= 0 || imageZoomNaturalHeight <= 0) return;
+        const viewportWidth = Math.max(1, previewImageZoomViewport.clientWidth);
+        const viewportHeight = Math.max(1, previewImageZoomViewport.clientHeight);
+        const fitScale = Math.min(viewportWidth / imageZoomNaturalWidth, viewportHeight / imageZoomNaturalHeight, 1);
+        applyImageZoom(fitScale);
+        const contentWidth = imageZoomNaturalWidth * imageZoomScale;
+        const contentHeight = imageZoomNaturalHeight * imageZoomScale;
+        previewImageZoomViewport.scrollLeft = Math.max(0, (contentWidth - viewportWidth) / 2);
+        previewImageZoomViewport.scrollTop = Math.max(0, (contentHeight - viewportHeight) / 2);
+      }
+
+      function closeImageZoom() {
+        if (!(previewImageZoom instanceof HTMLElement)) return;
+        previewImageZoom.hidden = true;
+        previewImageZoom.setAttribute("aria-hidden", "true");
+        stopImageZoomDrag();
+        imageZoomScale = 1;
+        imageZoomNaturalWidth = 0;
+        imageZoomNaturalHeight = 0;
+        if (previewImageZoomViewport instanceof HTMLElement) {
+          previewImageZoomViewport.scrollLeft = 0;
+          previewImageZoomViewport.scrollTop = 0;
+          previewImageZoomViewport.classList.remove("draggable");
+          previewImageZoomViewport.classList.remove("dragging");
+        }
+        if (previewImageZoomImg instanceof HTMLImageElement) {
+          previewImageZoomImg.removeAttribute("src");
+          previewImageZoomImg.alt = "";
+          previewImageZoomImg.style.removeProperty("width");
+          previewImageZoomImg.style.removeProperty("height");
+        }
+      }
+
+      function openImageZoom(src, altText) {
+        if (!(previewImageZoom instanceof HTMLElement)) return;
+        if (!(previewImageZoomImg instanceof HTMLImageElement)) return;
+        imageZoomScale = 1;
+        imageZoomNaturalWidth = 0;
+        imageZoomNaturalHeight = 0;
+        previewImageZoomImg.style.removeProperty("width");
+        previewImageZoomImg.style.removeProperty("height");
+        previewImageZoomImg.alt = altText || "Image preview";
+        previewImageZoomImg.src = src;
+        previewImageZoom.hidden = false;
+        previewImageZoom.setAttribute("aria-hidden", "false");
+        if (previewImageZoomImg.complete && previewImageZoomImg.naturalWidth > 0 && previewImageZoomImg.naturalHeight > 0) {
+          imageZoomNaturalWidth = previewImageZoomImg.naturalWidth;
+          imageZoomNaturalHeight = previewImageZoomImg.naturalHeight;
+          fitImageZoomToViewport();
+        }
+      }
+
       function setActivePreviewRow(row) {
         if (activePreviewRow) activePreviewRow.classList.remove("preview-active");
         activePreviewRow = row;
@@ -577,6 +702,7 @@ function createDirectoryHtml(urlPath, items) {
       }
 
       function closePreview() {
+        closeImageZoom();
         cancelActivePreviewRequest();
         setPreviewOpen(false);
         setActivePreviewRow(null);
@@ -681,6 +807,7 @@ function createDirectoryHtml(urlPath, items) {
         const modifiedLabel = row.dataset.modifiedLabel || "-";
         const mime = row.dataset.mime || "unknown";
 
+        closeImageZoom();
         setPreviewOpen(true);
         setActivePreviewRow(row);
         if (previewMeta) {
@@ -706,18 +833,23 @@ function createDirectoryHtml(urlPath, items) {
         if (kind === "image") {
           clearNode(previewBody);
           const img = document.createElement("img");
-          img.className = "preview-image";
+          img.className = "preview-image zoomable";
           img.alt = name;
           img.loading = "lazy";
           img.src = previewUrl;
+          img.title = "Click image to zoom";
           img.addEventListener("error", () => {
             if (requestId !== previewRequestId) return;
             setPreviewMessage("Image preview unavailable.");
           });
+          img.addEventListener("click", () => {
+            if (requestId !== previewRequestId) return;
+            openImageZoom(previewUrl, name);
+          });
           previewBody.appendChild(img);
           const note = document.createElement("p");
           note.className = "preview-note";
-          note.textContent = "Image preview";
+          note.textContent = "Image preview. Click image to zoom, use mouse wheel to zoom in/out, and drag to pan.";
           previewBody.appendChild(note);
           return;
         }
@@ -904,7 +1036,105 @@ function createDirectoryHtml(urlPath, items) {
         if (row) void openPreview(row);
       });
 
+      previewImageZoomImg?.addEventListener("load", () => {
+        if (!(previewImageZoomImg instanceof HTMLImageElement)) return;
+        if (!isImageZoomOpen()) return;
+        if (previewImageZoomImg.naturalWidth <= 0 || previewImageZoomImg.naturalHeight <= 0) return;
+        imageZoomNaturalWidth = previewImageZoomImg.naturalWidth;
+        imageZoomNaturalHeight = previewImageZoomImg.naturalHeight;
+        fitImageZoomToViewport();
+      });
+
+      previewImageZoomViewport?.addEventListener("wheel", (event) => {
+        if (!isImageZoomOpen()) return;
+        if (!(previewImageZoomViewport instanceof HTMLElement)) return;
+        if (imageZoomNaturalWidth <= 0 || imageZoomNaturalHeight <= 0) return;
+        event.preventDefault();
+        const factor = Math.exp(-event.deltaY * 0.0015);
+        const previousScale = imageZoomScale;
+        const nextScale = clampImageZoomScale(previousScale * factor);
+        if (Math.abs(nextScale - previousScale) < 0.0001) return;
+        const rect = previewImageZoomViewport.getBoundingClientRect();
+        const anchorViewportX = event.clientX - rect.left;
+        const anchorViewportY = event.clientY - rect.top;
+        const anchorImageX = anchorViewportX + previewImageZoomViewport.scrollLeft;
+        const anchorImageY = anchorViewportY + previewImageZoomViewport.scrollTop;
+        const prevWidth = imageZoomNaturalWidth * previousScale;
+        const prevHeight = imageZoomNaturalHeight * previousScale;
+        const ratioX = prevWidth > 0 ? anchorImageX / prevWidth : 0.5;
+        const ratioY = prevHeight > 0 ? anchorImageY / prevHeight : 0.5;
+        applyImageZoom(nextScale);
+        const nextWidth = imageZoomNaturalWidth * imageZoomScale;
+        const nextHeight = imageZoomNaturalHeight * imageZoomScale;
+        previewImageZoomViewport.scrollLeft = ratioX * nextWidth - anchorViewportX;
+        previewImageZoomViewport.scrollTop = ratioY * nextHeight - anchorViewportY;
+      }, { passive: false });
+
+      previewImageZoomViewport?.addEventListener("pointerdown", (event) => {
+        if (!isImageZoomOpen()) return;
+        if (!(previewImageZoomViewport instanceof HTMLElement)) return;
+        if (event.button !== 0) return;
+        if (!canDragZoomImage()) return;
+        imageZoomDragging = true;
+        imageZoomPointerId = event.pointerId;
+        imageZoomDragStartX = event.clientX;
+        imageZoomDragStartY = event.clientY;
+        imageZoomStartScrollLeft = previewImageZoomViewport.scrollLeft;
+        imageZoomStartScrollTop = previewImageZoomViewport.scrollTop;
+        previewImageZoomViewport.classList.add("dragging");
+        try {
+          previewImageZoomViewport.setPointerCapture(event.pointerId);
+        } catch {
+          // Ignore pointer capture failures.
+        }
+        event.preventDefault();
+      });
+
+      previewImageZoomViewport?.addEventListener("pointermove", (event) => {
+        if (!imageZoomDragging) return;
+        if (event.pointerId !== imageZoomPointerId) return;
+        if (!(previewImageZoomViewport instanceof HTMLElement)) return;
+        const deltaX = event.clientX - imageZoomDragStartX;
+        const deltaY = event.clientY - imageZoomDragStartY;
+        previewImageZoomViewport.scrollLeft = imageZoomStartScrollLeft - deltaX;
+        previewImageZoomViewport.scrollTop = imageZoomStartScrollTop - deltaY;
+        event.preventDefault();
+      });
+
+      previewImageZoomViewport?.addEventListener("pointerup", (event) => {
+        if (!imageZoomDragging) return;
+        if (event.pointerId !== imageZoomPointerId) return;
+        if (previewImageZoomViewport instanceof HTMLElement && previewImageZoomViewport.hasPointerCapture(event.pointerId)) {
+          previewImageZoomViewport.releasePointerCapture(event.pointerId);
+        }
+        stopImageZoomDrag();
+      });
+
+      previewImageZoomViewport?.addEventListener("pointercancel", (event) => {
+        if (!imageZoomDragging) return;
+        if (event.pointerId !== imageZoomPointerId) return;
+        if (previewImageZoomViewport instanceof HTMLElement && previewImageZoomViewport.hasPointerCapture(event.pointerId)) {
+          previewImageZoomViewport.releasePointerCapture(event.pointerId);
+        }
+        stopImageZoomDrag();
+      });
+
+      previewImageZoomViewport?.addEventListener("lostpointercapture", () => {
+        stopImageZoomDrag();
+      });
+
       previewClose?.addEventListener("click", closePreview);
+      previewImageZoomClose?.addEventListener("click", (event) => {
+        event.preventDefault();
+        closeImageZoom();
+      });
+      previewImageZoom?.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        if (target === previewImageZoom) {
+          closeImageZoom();
+        }
+      });
       previewCopy?.addEventListener("click", async () => {
         if (!previewCopyText) return;
         try {
@@ -928,6 +1158,7 @@ function createDirectoryHtml(urlPath, items) {
         const target = event.target;
         if (!(target instanceof Element)) return;
         if (target.closest("#previewDrawer")) return;
+        if (target.closest("#previewImageZoom")) return;
         if (target.closest("a.preview-link")) return;
         closePreview();
       });
@@ -945,6 +1176,11 @@ function createDirectoryHtml(urlPath, items) {
         }
 
         if (event.key === "Escape") {
+          if (isImageZoomOpen()) {
+            event.preventDefault();
+            closeImageZoom();
+            return;
+          }
           if (active === searchInput) {
             event.preventDefault();
             if (searchInput.value) {
@@ -1408,7 +1644,7 @@ async function runSelfTests() {
       assert(response.status === 400, `Expected 400, got ${response.status}`);
     });
 
-    await test("directory listing exposes download and view links for text file", async () => {
+    await test("directory listing uses Name for download and Operations for preview/view", async () => {
       const app = new HttpFileServer({ root: testRoot });
       const response = await app.handleRequest(new Request("http://localhost/"));
       assert(response.status === 200, `Expected 200, got ${response.status}`);
@@ -1418,24 +1654,39 @@ async function runSelfTests() {
       assert(body.includes("scrollbar-gutter: stable"), "Expected stable scrollbar gutter");
       assert(body.includes("note.txt"), "Expected note.txt in listing");
       assert(body.includes('id="previewDrawer"'), "Expected floating preview drawer markup");
+      assert(body.includes('id="previewImageZoom"'), "Expected image zoom overlay markup");
+      assert(body.includes('id="previewImageZoomViewport"'), "Expected image zoom viewport markup");
       assert(body.includes('id="previewCopy"'), "Expected preview copy button");
       assert(body.includes('aria-label="Copy preview text"'), "Expected icon-style copy button accessibility label");
       assert(body.includes('aria-label="Close preview panel"'), "Expected icon-style close button accessibility label");
       assert(body.includes("preview-textbox"), "Expected readonly preview textbox styles");
+      assert(body.includes(".preview-image.zoomable"), "Expected zoom cursor style for preview image");
+      assert(body.includes(".preview-image-zoom-viewport"), "Expected zoom viewport style for image preview");
+      assert(body.includes("scrollbar-width: none"), "Expected hidden scrollbar style for image zoom viewport");
+      assert(body.includes(".preview-image-zoom-viewport.draggable"), "Expected grab cursor style for zoom viewport");
       assert(body.includes('class="preview-link" href="note.txt?action=view"'), "Expected text preview link");
       assert(body.includes('class="preview-link" href="guide.rst?action=view"'), "Expected preview link for .rst");
       assert(body.includes('class="preview-link" href="cover.png"'), "Expected image preview link");
-      assert(body.includes('note.txt?action=download'), "Expected download link for note.txt");
+      assert(body.includes('note.txt?action=download'), "Expected download target for note.txt");
+      assert(body.includes('<td class="name" data-sort="note.txt"><a class="name-link" href="note.txt?action=download"'), "Expected note.txt Name link to download");
+      assert(body.includes('<td class="name" data-sort="cover.png"><a class="name-link" href="cover.png?action=download"'), "Expected cover.png Name link to download");
+      assert(body.includes('<td class="name" data-sort="sub"><a class="name-link" href="sub/"'), "Expected directory Name link to keep navigation");
       assert(body.includes('note.txt?action=view'), "Expected view link for note.txt");
       assert(body.includes('LICENSE?action=view'), "Expected view link for LICENSE");
       assert(body.includes('guide.rst?action=view'), "Expected view link for .rst");
       assert(body.includes('>preview<'), "Expected preview label");
-      assert(body.includes('>download<'), "Expected download label");
+      assert(!body.includes('>download<'), "Expected download label removed from Operations column");
       assert(body.includes('>view<'), "Expected view label");
       assert(body.includes('class="name-icon file"'), "Expected file icon in Name column");
       assert(!body.includes('data-key="type"'), "Expected Type column to be removed");
       assert(body.includes('document.addEventListener("pointerdown"'), "Expected outside-click close hook");
       assert(body.includes('previewCopy?.addEventListener("click"'), "Expected copy click hook");
+      assert(body.includes('previewImageZoomClose?.addEventListener("click"'), "Expected image zoom close hook");
+      assert(body.includes('previewImageZoomViewport?.addEventListener("wheel"'), "Expected image zoom wheel hook");
+      assert(body.includes('previewImageZoomViewport?.addEventListener("pointerdown"'), "Expected image zoom drag-start hook");
+      assert(body.includes("previewImageZoomViewport.classList.add(\"dragging\")"), "Expected dragging state toggle for zoom viewport");
+      assert(body.includes("Math.exp(-event.deltaY * 0.0015)"), "Expected smooth wheel zoom factor");
+      assert(body.includes("openImageZoom(previewUrl, name)"), "Expected image zoom open hook");
       assert(body.includes('response.headers.get("content-length")'), "Expected content-length preview guard");
       assert(body.includes("response.body.getReader"), "Expected stream reader preview guard");
       assert(body.includes("new AbortController()"), "Expected abort controller for preview request lifecycle");
