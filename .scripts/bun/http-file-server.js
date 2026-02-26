@@ -342,10 +342,30 @@ function createDirectoryHtml(urlPath, items) {
     .preview-textbox:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.22); }
     .preview-image { display: block; max-width: 100%; height: auto; border-radius: 8px; background: #f8fafc; }
     .preview-note { margin: 0.55rem 0 0; color: var(--muted); font-size: 0.8rem; }
-    .sort-btn { appearance: none; border: none; background: transparent; color: inherit; font: inherit; font-weight: inherit; cursor: pointer; padding: 0; }
-    .sort-btn::after { content: "  "; }
-    .sort-btn[data-dir="asc"]::after { content: " ^"; }
-    .sort-btn[data-dir="desc"]::after { content: " v"; }
+    .sort-btn { appearance: none; border: none; background: transparent; color: inherit; font: inherit; font-weight: inherit; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 0.25rem; }
+    .sort-btn::after {
+      content: "";
+      width: 0.72rem;
+      height: 0.72rem;
+      opacity: 0;
+      background: currentColor;
+      mask-repeat: no-repeat;
+      mask-position: center;
+      mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      -webkit-mask-size: contain;
+    }
+    .sort-btn[data-dir="asc"]::after {
+      opacity: 0.9;
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 8 6 4l4 4' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 8 6 4l4 4' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+    .sort-btn[data-dir="desc"]::after {
+      opacity: 0.9;
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4 6 8l4-4' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4 6 8l4-4' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
     a { text-decoration: none; color: var(--link); }
     a:hover { text-decoration: underline; }
     .muted { color: var(--muted); }
