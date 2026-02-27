@@ -2,7 +2,7 @@
 
 import { mkdtemp, mkdir, readdir, realpath, rm, stat, symlink, writeFile } from "node:fs/promises";
 import { realpathSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { networkInterfaces, tmpdir } from "node:os";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 
 const DEFAULT_CONFIG = Object.freeze({
@@ -167,6 +167,61 @@ function buildIndexPathHtml(urlPath) {
     }
   }
   return crumbs.join("");
+}
+
+function normalizeHost(host) {
+  const value = String(host || "").trim();
+  if (value.startsWith("[") && value.endsWith("]")) {
+    return value.slice(1, -1);
+  }
+  return value;
+}
+
+function normalizeAddressFamily(family) {
+  if (family === "IPv4" || family === 4) return "IPv4";
+  if (family === "IPv6" || family === 6) return "IPv6";
+  return "";
+}
+
+function isWildcardHost(host) {
+  const normalized = normalizeHost(host).toLowerCase();
+  return normalized === "0.0.0.0" || normalized === "::";
+}
+
+function formatHostForUrl(host) {
+  const normalized = normalizeHost(host);
+  const zoneIdx = normalized.indexOf("%");
+  const zoneEscaped = zoneIdx >= 0
+    ? `${normalized.slice(0, zoneIdx)}%25${normalized.slice(zoneIdx + 1)}`
+    : normalized;
+  if (zoneEscaped.includes(":")) {
+    return `[${zoneEscaped}]`;
+  }
+  return zoneEscaped;
+}
+
+function listReachableUrls(host, port, interfaces = networkInterfaces()) {
+  const normalized = normalizeHost(host);
+  if (!isWildcardHost(normalized)) {
+    return [`http://${formatHostForUrl(normalized)}:${port}`];
+  }
+
+  const family = normalized === "::" ? "IPv6" : "IPv4";
+  const addresses = [];
+  for (const entries of Object.values(interfaces || {})) {
+    if (!Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      if (!entry || typeof entry.address !== "string") continue;
+      if (normalizeAddressFamily(entry.family) !== family) continue;
+      addresses.push(entry.address);
+    }
+  }
+
+  const uniqueAddresses = [...new Set(addresses)].sort((a, b) => a.localeCompare(b));
+  if (uniqueAddresses.length === 0) {
+    return [`http://${formatHostForUrl(normalized)}:${port}`];
+  }
+  return uniqueAddresses.map((address) => `http://${formatHostForUrl(address)}:${port}`);
 }
 
 const DIRECTORY_LISTING_STYLES = String.raw`
@@ -1466,6 +1521,28 @@ async function runSelfTests() {
     assert(blocked === null, "Expected traversal path to be blocked");
   });
 
+  await test("listReachableUrls expands wildcard IPv4 bindings", () => {
+    const urls = listReachableUrls("0.0.0.0", 3000, {
+      lo: [{ address: "127.0.0.1", family: "IPv4" }],
+      eth0: [{ address: "192.168.1.20", family: 4 }],
+      lo6: [{ address: "::1", family: "IPv6" }],
+    });
+    assert(urls.length === 2, `Expected 2 URLs, got ${urls.length}`);
+    assert(urls.includes("http://127.0.0.1:3000"), "Expected loopback IPv4 URL");
+    assert(urls.includes("http://192.168.1.20:3000"), "Expected interface IPv4 URL");
+  });
+
+  await test("listReachableUrls formats IPv6 bindings with brackets", () => {
+    const urls = listReachableUrls("::", 8080, {
+      lo6: [{ address: "::1", family: "IPv6" }],
+      link: [{ address: "fe80::1%eth0", family: 6 }],
+      lo: [{ address: "127.0.0.1", family: "IPv4" }],
+    });
+    assert(urls.length === 2, `Expected 2 URLs, got ${urls.length}`);
+    assert(urls.includes("http://[::1]:8080"), "Expected IPv6 loopback URL");
+    assert(urls.includes("http://[fe80::1%25eth0]:8080"), "Expected escaped IPv6 zone URL");
+  });
+
   await test("preview kind follows mime rules", () => {
     assert(getPreviewKind("text/plain; charset=utf-8") === PREVIEW_KIND_TEXT, "text/* should be text preview kind");
     assert(getPreviewKind("image/jpeg") === PREVIEW_KIND_IMAGE, "image/* should be image preview kind");
@@ -1658,6 +1735,10 @@ if (import.meta.main) {
   }
   const app = new HttpFileServer(config);
   const server = app.start();
+  const urls = listReachableUrls(app.host, server.port);
   console.log(`Serving ${app.rootDir}`);
-  console.log(`http://${app.host}:${server.port}`);
+  console.log("Available URLs:");
+  for (const url of urls) {
+    console.log(`  ${url}`);
+  }
 }
