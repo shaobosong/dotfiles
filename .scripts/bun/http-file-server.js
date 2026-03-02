@@ -1035,6 +1035,10 @@ const DIRECTORY_LISTING_SCRIPT_TEMPLATE = String.raw`
   });
 
   previewClose?.addEventListener("click", closePreview);
+  previewBody?.addEventListener("click", (event) => {
+    if (event.target !== previewBody) return;
+    closePreview();
+  });
   previewImageZoomClose?.addEventListener("click", (event) => {
     event.preventDefault();
     closeImageZoom();
@@ -1659,6 +1663,7 @@ async function runSelfTests() {
       assert(body.includes('id="previewImageZoom"'), "Expected image zoom overlay markup");
       assert(body.includes('id="previewImageZoomViewport"'), "Expected image zoom viewport markup");
       assert(body.includes('id="previewCopy"'), "Expected preview copy button");
+      assert(body.includes('previewBody?.addEventListener("click"'), "Expected blank preview area close handler");
       assert(body.includes('id="searchInput"'), "Expected search input");
       assert(body.includes('id="searchClear"'), "Expected search clear button");
       assert(body.includes('data-key="name"'), "Expected name sort header");
