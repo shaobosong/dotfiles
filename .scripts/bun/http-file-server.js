@@ -200,15 +200,24 @@ function formatHostForUrl(host) {
   return zoneEscaped;
 }
 
-function listReachableUrls(host, port, interfaces = networkInterfaces()) {
+function listReachableUrls(host, port, interfaces, loadInterfaces = networkInterfaces) {
   const normalized = normalizeHost(host);
   if (!isWildcardHost(normalized)) {
     return [`http://${formatHostForUrl(normalized)}:${port}`];
   }
 
+  let resolvedInterfaces = interfaces;
+  if (resolvedInterfaces === undefined) {
+    try {
+      resolvedInterfaces = loadInterfaces();
+    } catch {
+      return [`http://${formatHostForUrl(normalized)}:${port}`];
+    }
+  }
+
   const family = normalized === "::" ? "IPv6" : "IPv4";
   const addresses = [];
-  for (const entries of Object.values(interfaces || {})) {
+  for (const entries of Object.values(resolvedInterfaces || {})) {
     if (!Array.isArray(entries)) continue;
     for (const entry of entries) {
       if (!entry || typeof entry.address !== "string") continue;
@@ -1541,6 +1550,14 @@ async function runSelfTests() {
     assert(urls.length === 2, `Expected 2 URLs, got ${urls.length}`);
     assert(urls.includes("http://[::1]:8080"), "Expected IPv6 loopback URL");
     assert(urls.includes("http://[fe80::1%25eth0]:8080"), "Expected escaped IPv6 zone URL");
+  });
+
+  await test("listReachableUrls falls back when interface lookup fails", () => {
+    const urls = listReachableUrls("0.0.0.0", 3000, undefined, () => {
+      throw new Error("EPERM");
+    });
+    assert(urls.length === 1, `Expected 1 fallback URL, got ${urls.length}`);
+    assert(urls[0] === "http://0.0.0.0:3000", `Expected wildcard fallback URL, got ${urls[0]}`);
   });
 
   await test("preview kind follows mime rules", () => {
