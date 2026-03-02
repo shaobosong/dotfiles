@@ -357,6 +357,7 @@ const DIRECTORY_LISTING_SCRIPT_TEMPLATE = String.raw`
   const searchInput = document.getElementById("searchInput");
   const searchClear = document.getElementById("searchClear");
   const previewDrawer = document.getElementById("previewDrawer");
+  const previewHead = document.getElementById("previewHead");
   const previewMeta = document.getElementById("previewMeta");
   const previewBody = document.getElementById("previewBody");
   const previewCopy = document.getElementById("previewCopy");
@@ -1035,6 +1036,12 @@ const DIRECTORY_LISTING_SCRIPT_TEMPLATE = String.raw`
   });
 
   previewClose?.addEventListener("click", closePreview);
+  previewHead?.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest("button")) return;
+    closePreview();
+  });
   previewBody?.addEventListener("click", (event) => {
     if (event.target !== previewBody) return;
     closePreview();
@@ -1193,7 +1200,7 @@ ${DIRECTORY_LISTING_STYLES}
     </div>
   </main>
   <aside id="previewDrawer" class="preview-drawer" aria-label="File preview" aria-hidden="true">
-    <div class="preview-head">
+    <div id="previewHead" class="preview-head">
       <h2 class="preview-title">Preview</h2>
       <div class="preview-actions">
         <button id="previewCopy" type="button" class="preview-btn" data-copy-state="idle" aria-label="Copy preview text" title="Copy preview text" disabled><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="5" y="5" width="8" height="8" rx="1.4"></rect><path d="M3 10V3.8C3 3.36 3.36 3 3.8 3H10"></path></svg></button>
@@ -1662,7 +1669,9 @@ async function runSelfTests() {
       assert(body.includes('id="previewDrawer"'), "Expected floating preview drawer markup");
       assert(body.includes('id="previewImageZoom"'), "Expected image zoom overlay markup");
       assert(body.includes('id="previewImageZoomViewport"'), "Expected image zoom viewport markup");
+      assert(body.includes('id="previewHead"'), "Expected preview header markup");
       assert(body.includes('id="previewCopy"'), "Expected preview copy button");
+      assert(body.includes('previewHead?.addEventListener("click"'), "Expected preview header close handler");
       assert(body.includes('previewBody?.addEventListener("click"'), "Expected blank preview area close handler");
       assert(body.includes('id="searchInput"'), "Expected search input");
       assert(body.includes('id="searchClear"'), "Expected search clear button");
