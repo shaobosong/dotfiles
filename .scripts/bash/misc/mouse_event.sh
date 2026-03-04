@@ -11,7 +11,7 @@ function parse_args () {
             -\? | -h | --help)
                 echo $"Usage: $PROGNAME [options] [configure options]
       --help                     Print this message
-      --action=<on|off>          Build type (default: debug)"
+      --action=<on|off>          Build type (default: off)"
                 exit 0
                 ;;
             --action=on | --action=off)
