@@ -148,6 +148,7 @@ export GOPATH=$HOME/.go
 export GOPROXY=https://goproxy.cn
 export PATH=$_scripts/link:$PATH
 export PATH=$HOME/.cargo/bin:$PATH
+export PATH=$HOME/.local/bin:$PATH
 
 # sources
 if test -f /usr/share/fzf/completion.bash; then
