@@ -11,6 +11,7 @@ return {
         install_dir = vim.fn.stdpath('data') .. '/site',
       }
       nvim_treesitter.install {
+        'bash',
         'c', 'cpp', 'c3',
         'lua',
         -- 'python',
