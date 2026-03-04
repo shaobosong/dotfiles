@@ -628,6 +628,9 @@ local finder = {
           prompt = "> ",
           winopts = {
             title = " Grep AST Identifier ",
+            preview = {
+                layout = "vertical"
+            },
           },
           keymap = {
             fzf = {
