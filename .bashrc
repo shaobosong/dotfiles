@@ -135,7 +135,6 @@ export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
 export XDG_STATE_HOME=$HOME/.local/state
 export EDITOR=/usr/bin/nano
-export PROMPT_COMMAND="history -a; #history -n"
 export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first,alt-enter:accept --color=dark"
 export DELTA_FEATURES='+side-by-side'
 export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
@@ -157,14 +156,17 @@ fi
 if test -f /usr/share/fzf/key-bindings.bash; then
     source /usr/share/fzf/key-bindings.bash
 fi
+if test -f ${_scripts}/misc/prompt_command.sh; then
+    source ${_scripts}/misc/prompt_command.sh
+fi
 if test -f ${_scripts}/misc/fzf-kit.sh; then
     source ${_scripts}/misc/fzf-kit.sh
 fi
 if test -f ${_scripts}/misc/ci.sh; then
     source ${_scripts}/misc/ci.sh
 fi
-if test -f ${_scripts}/misc/ud.sh; then
-    source ${_scripts}/misc/ud.sh
+if test -f ${_scripts}/misc/d.sh; then
+    source ${_scripts}/misc/d.sh
 fi
 if test -f ~/.bashrc_extra; then
     source ~/.bashrc_extra
