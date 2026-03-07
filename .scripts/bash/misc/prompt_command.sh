@@ -13,7 +13,7 @@ _terminal_title_hook() {
 
 _history_sync_hook() {
     history -a
-    #history -n
+    # history -n
 }
 
 # =====================================================================
@@ -25,35 +25,54 @@ GHOST_VIRTUAL_PATH="$PWD"
 _update_ps1_hook() {
     local last_status=$?
 
-    local COLOR_USER="\e[1;32m"
-    local COLOR_REAL_PATH="\e[1;34m"
-    local COLOR_GHOST_PATH="\e[2;34m"
-    local COLOR_OK="\e[1;32m"
-    local COLOR_ERR="\e[1;31m"
+    # local COLOR_PREFIX="\e[38;5;2m"
+    local COLOR_OLD_0="\e[38;5;3m"
+    local COLOR_OLD_1="\e[2;38;5;3m"
+    local COLOR_REAL="\e[38;5;4m"
+    local COLOR_GHOST="\e[2;38;5;4m"
+    local COLOR_OK="\e[38;5;2m"
+    local COLOR_ERR="\e[38;5;1m"
     local COLOR_RESET="\e[0m"
 
+    # local prefix="\u@\h:"
+    local old_0=""
+    local real=""
+    local old_1=""
     local ghost=""
-    case "$GHOST_VIRTUAL_PATH" in
-        "$PWD")
-            ;;
-        "$PWD"/*)
-            ghost="${GHOST_VIRTUAL_PATH#$PWD}"
-            ;;
-        *)
-            GHOST_VIRTUAL_PATH="$PWD"
-            ;;
-    esac
 
-    local real_pwd="${PWD/#$HOME/\~}"
+    if [[ $GHOST_VIRTUAL_PATH" != "$PWD" && $GHOST_VIRTUAL_PATH" != "$PWD"/* ]]; then
+        GHOST_VIRTUAL_PATH="$PWD"
+    fi
+
+    if [[ -n "$OLDPWD" && "$PWD" == "$OLDPWD" ]]; then
+        old_0="${PWD/#$HOME/\~}"
+        ghost="${GHOST_VIRTUAL_PATH#$PWD}"
+    elif [[ -n "$OLDPWD" && "$PWD" == "$OLDPWD"/* ]]; then
+        old_0="${OLDPWD/#$HOME/\~}"
+        real="${PWD#$OLDPWD}"
+        ghost="${GHOST_VIRTUAL_PATH#$PWD}"
+    elif [[ -n "$OLDPWD" && "$OLDPWD" == "$PWD"/* ]]; then
+        old_0="${PWD/#$HOME/\~}"
+        old_1="${OLDPWD#$PWD}"
+        ghost="${GHOST_VIRTUAL_PATH#$OLDPWD}"
+    else
+        real="${PWD/#$HOME/\~}"
+    fi
 
     local status_color=$COLOR_ERR
     test ${last_status} -eq 0 && status_color=$COLOR_OK
 
-    PS1="\[${COLOR_USER}\]\u@\h\[${COLOR_RESET}\]:"
-    PS1+="\[${COLOR_REAL_PATH}\]${real_pwd}\[${COLOR_RESET}\]"
+    PS1=""
+    # PS1+="${COLOR_PREFIX}${prefix}${COLOR_RESET}"
+    [[ -n "$old_0" ]] && \
+        PS1+="${COLOR_OLD_0}${old_0}${COLOR_RESET}"
+    [[ -n "$real" ]] && \
+        PS1+="${COLOR_REAL}${real}${COLOR_RESET}"
+    [[ -n "$old_1" ]] && \
+        PS1+="${COLOR_OLD_1}${old_1}${COLOR_RESET}"
     [[ -n "$ghost" ]] && \
-        PS1+="\[${COLOR_GHOST_PATH}\]${ghost}\[${COLOR_RESET}\]"
-    PS1+=" \[${status_color}\](${last_status})\[${COLOR_RESET}\]"
+        PS1+="${COLOR_GHOST}${ghost}${COLOR_RESET}"
+    PS1+=" ${status_color}(${last_status})${COLOR_RESET}"
     PS1+='\n# '
 }
 
