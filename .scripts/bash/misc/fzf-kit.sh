@@ -283,14 +283,14 @@ fzf_kit() {
 
     declare -A fzf_actions
     fzf_actions=(
-        ["file-vim"]="_fzf_file_vim_action"
-        ["grep-vim"]="_fzf_grep_vim_action"
-        ["process"]="_fzf_process_action"
-        ["${proxy_label}"]="_fzf_toggle_proxy_action"
+        ["files"]="_fzf_file_vim_action"
+        ["lines"]="_fzf_grep_vim_action"
+        # ["process"]="_fzf_process_action"
+        # ["${proxy_label}"]="_fzf_toggle_proxy_action"
     )
 
     if command -v tmux &> /dev/null && [[ -n "${TMUX_PANE-}" ]]; then
-        fzf_actions["tmux-pane-search"]="_fzf_tmux_pane_search_action"
+        fzf_actions["tmux-pane-lines"]="_fzf_tmux_pane_search_action"
     fi
 
     __options=$(printf "%s\n" "${!fzf_actions[@]}" | sort)
