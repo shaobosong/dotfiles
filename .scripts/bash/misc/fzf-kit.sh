@@ -184,7 +184,6 @@ _fzf_grep_vim_action() {
 
 _fzf_tmux_pane_search_action() {
     local pane_id="${1:-${TMUX_PANE-}}"
-    local -a pane_lines=()
     local fzf_output=
     local line_num=
     local fzf_status=
@@ -214,17 +213,11 @@ _fzf_tmux_pane_search_action() {
     fzf_query=
 
     while true; do
-        tmux_pane_search_build_lines "${pane_id}" || {
-            echo "Error: ${TMUX_PANE_SEARCH_LAST_ERROR}" >&2
-            return 1
-        }
-        pane_lines=("${TMUX_PANE_SEARCH_LINES[@]}")
-
-        (( ${#pane_lines[@]} > 0 )) || return 0
-
-        fzf_output=$(printf '%s\n' "${pane_lines[@]}" | ${FZF_CMD} \
-            --tac \
+        # Note: must start up fzf with popup window, not append extra output to the pane buffer.
+        fzf_output=$(tmux_pane_search_build_lines "${pane_id}" | ${FZF_CMD} \
+            --no-sort \
             --print-query \
+            --tmux center,85% \
             --delimiter=: \
             --nth=2.. \
             --query="${fzf_query}" \

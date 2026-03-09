@@ -20,9 +20,9 @@ fi
 [[ -n "${pane_id}" ]] || exit 0
 
 if command -v fzf-tmux >/dev/null 2>&1; then
-    fzf_bin=(fzf-tmux -p 85%,70%)
+    fzf_bin=(fzf-tmux -p 85%,85%)
 elif command -v fzf >/dev/null 2>&1; then
-    fzf_bin=(fzf --tmux 85%,70%)
+    fzf_bin=(fzf --tmux 85%,85%)
 else
     tmux display-message "Failed to find fzf or fzf-tmux"
     exit 0
@@ -33,18 +33,10 @@ resize_bind="resize:print(${resize_token})+accept"
 fzf_query=
 
 while true; do
-    tmux_pane_search_build_lines "${pane_id}" || {
-        tmux display-message "tmux-copy-fzf-search: ${TMUX_PANE_SEARCH_LAST_ERROR}"
-        exit 1
-    }
-    pane_lines=("${TMUX_PANE_SEARCH_LINES[@]}")
-
-    (( ${#pane_lines[@]} > 0 )) || exit 0
-
-    fzf_output=$(printf '%s\n' "${pane_lines[@]}" | "${fzf_bin[@]}" \
+    fzf_output=$(tmux_pane_search_build_lines "${pane_id}" | "${fzf_bin[@]}" \
+        --no-sort \
         --bind=change:first \
         --color dark \
-        --tac \
         --print-query \
         --delimiter=: \
         --nth=2.. \
