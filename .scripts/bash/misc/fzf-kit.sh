@@ -28,7 +28,7 @@ CAT_HIGHLIGHT_LINE_OPT=
 
 FZF_CMD="fzf --bind=change:first --color dark"
 FZF_KIT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-TMUX_PANE_SEARCH_LIB="${FZF_KIT_DIR}/tmux-pane-search-lib.sh"
+TMUX_COPY_FZF_SEARCH="${FZF_KIT_DIR}/tmux-copy-fzf-search"
 
 if [[ -r "${TMUX_PANE_SEARCH_LIB}" ]]; then
     . "${TMUX_PANE_SEARCH_LIB}"
@@ -183,80 +183,7 @@ _fzf_grep_vim_action() {
 }
 
 _fzf_tmux_pane_search_action() {
-    local pane_id="${1:-${TMUX_PANE-}}"
-    local fzf_output=
-    local line_num=
-    local fzf_status=
-    local resize_token=
-    local resize_bind=
-    local fzf_query=
-    local fzf_payload=
-    local fzf_payload_first_line=
-
-    command -v tmux &> /dev/null || {
-        echo "Error: Failed to locate 'tmux'" >&2
-        return 1
-    }
-
-    [[ -n "${pane_id}" ]] || {
-        echo "Error: Not running inside a tmux pane" >&2
-        return 1
-    }
-
-    declare -F tmux_pane_search_build_lines &> /dev/null || {
-        echo "Error: Failed to load tmux pane search library" >&2
-        return 1
-    }
-
-    resize_token="0:__FZF_TMUX_PANE_RESIZE__:${pane_id#%}:$$"
-    resize_bind="resize:print(${resize_token})+accept"
-    fzf_query=
-
-    while true; do
-        # Note: must start up fzf with popup window, not append extra output to the pane buffer.
-        fzf_output=$(tmux_pane_search_build_lines "${pane_id}" | ${FZF_CMD} \
-            --no-sort \
-            --print-query \
-            --tmux center,85% \
-            --delimiter=: \
-            --nth=2.. \
-            --query="${fzf_query}" \
-            --prompt="Search Current Pane> " \
-            --header="tmux capture-pane -p -J -N -t ${pane_id} -S - (line no from -T -N)" \
-            --ghost="<enter>: Jump to line" \
-            --bind "${resize_bind}")
-        fzf_status=$?
-
-        (( fzf_status == 0 )) || return 0
-
-        if [[ "${fzf_output}" == *$'\n'* ]]; then
-            fzf_query="${fzf_output%%$'\n'*}"
-            fzf_payload="${fzf_output#*$'\n'}"
-        else
-            fzf_query="${fzf_output}"
-            fzf_payload=
-        fi
-
-        fzf_payload_first_line="${fzf_payload%%$'\n'*}"
-        [[ "${fzf_payload_first_line}" == "${resize_token}" ]] && continue
-        fzf_output="${fzf_payload_first_line}"
-        break
-    done
-
-    line_num="${fzf_output%%:*}"
-
-    [[ "${line_num}" =~ ^[0-9]+$ ]] || {
-        echo "Error: Failed to locate selected line number" >&2
-        return 1
-    }
-
-    tmux select-pane -t "${pane_id}" || return 1
-    tmux copy-mode -t "${pane_id}" || return 1
-    tmux send-keys -t "${pane_id}" -X history-top || return 1
-    tmux send-keys -t "${pane_id}" -X top-line || return 1
-    if (( line_num > 1 )); then
-        tmux send-keys -N "$((line_num - 1))" -t "${pane_id}" -X cursor-down || return 1
-    fi
+    $TMUX_COPY_FZF_SEARCH
 }
 
 _fzf_toggle_proxy_action() {
