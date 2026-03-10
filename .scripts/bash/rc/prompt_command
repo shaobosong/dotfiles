@@ -41,15 +41,19 @@ _update_ps1_hook() {
     local old_1=""
     local ghost=""
 
+    while test ! -d ${GHOST_VIRTUAL_PATH}; do
+        GHOST_VIRTUAL_PATH=${GHOST_VIRTUAL_PATH%/*}
+    done
+
     if [[ "${GHOST_VIRTUAL_PATH%/}"/ != "${PWD%/}"/* ]]; then
         GHOST_VIRTUAL_PATH="$PWD"
     fi
 
-    if [[ -n "$OLDPWD" && "${PWD%/}"/ == "${OLDPWD%/}"/* ]]; then
+    if [[ -d "$OLDPWD" && "${PWD%/}"/ == "${OLDPWD%/}"/* ]]; then
         old_0="${OLDPWD/#$HOME/\~}"
         real="${PWD#$OLDPWD}"
         ghost="${GHOST_VIRTUAL_PATH#$PWD}"
-    elif [[ -n "$OLDPWD" && "${OLDPWD%/}"/ == "${PWD%/}"/* ]]; then
+    elif [[ -d "$OLDPWD" && "${OLDPWD%/}"/ == "${PWD%/}"/* ]]; then
         old_0="${PWD/#$HOME/\~}"
         old_1="${OLDPWD#$PWD}"
         ghost="${GHOST_VIRTUAL_PATH#$OLDPWD}"
