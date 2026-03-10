@@ -6,7 +6,7 @@ if ! command -v tmux >/dev/null 2>&1; then
 fi
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-tmux_pane_search_lib="${script_dir}/tmux-pane-search-lib.sh"
+tmux_pane_search_lib="${script_dir}/../rc/tmux-pane-search-lib"
 if [[ ! -r "${tmux_pane_search_lib}" ]]; then
     tmux display-message "tmux-copy-fzf-search: missing tmux-pane-search-lib.sh"
     exit 1

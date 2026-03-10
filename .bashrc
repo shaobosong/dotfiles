@@ -156,17 +156,17 @@ fi
 if test -f /usr/share/fzf/key-bindings.bash; then
     source /usr/share/fzf/key-bindings.bash
 fi
-if test -f ${_scripts}/misc/prompt_command.sh; then
-    source ${_scripts}/misc/prompt_command.sh
+if test -f ${_scripts}/rc/prompt_command; then
+    source ${_scripts}/rc/prompt_command
 fi
-if test -f ${_scripts}/misc/fzf-kit.sh; then
-    source ${_scripts}/misc/fzf-kit.sh
+if test -f ${_scripts}/rc/fzf-kit; then
+    source ${_scripts}/rc/fzf-kit
 fi
-if test -f ${_scripts}/misc/ci.sh; then
-    source ${_scripts}/misc/ci.sh
+if test -f ${_scripts}/rc/ci; then
+    source ${_scripts}/rc/ci
 fi
-if test -f ${_scripts}/misc/d.sh; then
-    source ${_scripts}/misc/d.sh
+if test -f ${_scripts}/rc/d; then
+    source ${_scripts}/rc/d
 fi
 if test -f ~/.bashrc_extra; then
     source ~/.bashrc_extra

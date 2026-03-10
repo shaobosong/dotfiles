@@ -28,7 +28,7 @@ CAT_HIGHLIGHT_LINE_OPT=
 
 FZF_CMD="fzf --bind=change:first --color dark"
 FZF_KIT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-TMUX_COPY_FZF_SEARCH="${FZF_KIT_DIR}/tmux-copy-fzf-search"
+TMUX_COPY_FZF_SEARCH="${FZF_KIT_DIR}/../misc/tmux-copy-fzf-search.sh"
 
 if [[ -r "${TMUX_PANE_SEARCH_LIB}" ]]; then
     . "${TMUX_PANE_SEARCH_LIB}"
