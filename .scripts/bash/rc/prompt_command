@@ -23,8 +23,26 @@ _history_sync_hook() {
 
 GHOST_VIRTUAL_PATH="$PWD"
 
+_status_signal_name() {
+    local status=$1
+    local signal_number
+    local signal_name
+
+    if (( status <= 128 )); then
+        return 1
+    fi
+
+    signal_number=$((status - 128))
+    if ! signal_name=$(builtin kill -l "${signal_number}" 2>/dev/null); then
+        return 1
+    fi
+
+    printf 'SIG%s' "${signal_name}"
+}
+
 _update_ps1_hook() {
     local last_status=$?
+    local signal_name=""
 
     # local COLOR_PREFIX="\e[38;5;2m"
 
@@ -109,6 +127,7 @@ _update_ps1_hook() {
         [[ -n "$ghost" ]] && \
             PS1+="${COLOR_DARK_BLUE}${ghost}${COLOR_RESET}"
     else
+        signal_name=$(_status_signal_name "${last_status}") || signal_name=""
         # [[ -n "$old_0" ]] && \
         #     PS1+="${COLOR_RED}${old_0}${COLOR_RESET}"
         [[ -n "$real" ]] && \
@@ -117,6 +136,8 @@ _update_ps1_hook() {
         #     PS1+="${COLOR_DARK_RED}${old_1}${COLOR_RESET}"
         [[ -n "$ghost" ]] && \
             PS1+="${COLOR_DARK_YELLOW}${ghost}${COLOR_RESET}"
+        [[ -n "$signal_name" ]] && \
+            PS1+=" ${COLOR_RED}${signal_name}${COLOR_RESET}"
         PS1+=" ${COLOR_RED}(${last_status})${COLOR_RESET}"
     fi
     PS1+='\n✨ '
