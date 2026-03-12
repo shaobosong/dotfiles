@@ -46,42 +46,24 @@ _update_ps1_hook() {
 
     # local COLOR_PREFIX="\e[38;5;2m"
 
-    local COLOR_BLACK="\e[38;5;0m"
-    local COLOR_RED="\e[38;5;1m"
-    local COLOR_GREEN="\e[38;5;2m"
-    local COLOR_YELLOW="\e[38;5;3m"
-    local COLOR_BLUE="\e[38;5;4m"
-    local COLOR_MAGENTA="\e[38;5;5m"
-    local COLOR_CYAN="\e[38;5;6m"
-    local COLOR_WHITE="\e[38;5;7m"
+    local COLOR_BLACK="\e[30m"
+    local COLOR_RED="\e[31m"
+    local COLOR_GREEN="\e[32m"
+    local COLOR_YELLOW="\e[33m"
+    local COLOR_BLUE="\e[34m"
+    local COLOR_MAGENTA="\e[35m"
+    local COLOR_CYAN="\e[36m"
+    local COLOR_WHITE="\e[37m"
     local COLOR_RESET="\e[0m"
 
-    local COLOR_DARK_BLACK="\e[2;38;5;0m"
-    local COLOR_DARK_RED="\e[2;38;5;1m"
-    local COLOR_DARK_GREEN="\e[2;38;5;2m"
-    local COLOR_DARK_YELLOW="\e[2;38;5;3m"
-    local COLOR_DARK_BLUE="\e[2;38;5;4m"
-    local COLOR_DARK_MAGENTA="\e[2;38;5;5m"
-    local COLOR_DARK_CYAN="\e[2;38;5;6m"
-    local COLOR_DARK_WHITE="\e[2;38;5;7m"
-
-    local COLOR_BRIGHT_BLACK="\e[38;5;8m"
-    local COLOR_BRIGHT_RED="\e[38;5;9m"
-    local COLOR_BRIGHT_GREEN="\e[38;5;10m"
-    local COLOR_BRIGHT_YELLOW="\e[38;5;11m"
-    local COLOR_BRIGHT_BLUE="\e[38;5;12m"
-    local COLOR_BRIGHT_MAGENTA="\e[38;5;13m"
-    local COLOR_BRIGHT_CYAN="\e[38;5;14m"
-    local COLOR_BRIGHT_WHITE="\e[38;5;15m"
-
-    local COLOR_DARK_BRIGHT_BLACK="\e[2;38;5;8m"
-    local COLOR_DARK_BRIGHT_RED="\e[2;38;5;9m"
-    local COLOR_DARK_BRIGHT_GREEN="\e[2;38;5;10m"
-    local COLOR_DARK_BRIGHT_YELLOW="\e[2;38;5;11m"
-    local COLOR_DARK_BRIGHT_BLUE="\e[2;38;5;12m"
-    local COLOR_DARK_BRIGHT_MAGENTA="\e[2;38;5;13m"
-    local COLOR_DARK_BRIGHT_CYAN="\e[2;38;5;14m"
-    local COLOR_DARK_BRIGHT_WHITE="\e[2;38;5;15m"
+    local COLOR_DIM_BLACK="\e[2;30m"
+    local COLOR_DIM_RED="\e[2;31m"
+    local COLOR_DIM_GREEN="\e[2;32m"
+    local COLOR_DIM_YELLOW="\e[2;33m"
+    local COLOR_DIM_BLUE="\e[2;34m"
+    local COLOR_DIM_MAGENTA="\e[2;35m"
+    local COLOR_DIM_CYAN="\e[2;36m"
+    local COLOR_DIM_WHITE="\e[2;37m"
 
     local COLOR_RESET="\e[0m"
 
@@ -123,9 +105,9 @@ _update_ps1_hook() {
         [[ -n "$real" ]] && \
             PS1+="${COLOR_BLUE}${real}${COLOR_RESET}"
         # [[ -n "$old_1" ]] && \
-        #     PS1+="${COLOR_DARK_GREEN}${old_1}${COLOR_RESET}"
+        #     PS1+="${COLOR_DIM_GREEN}${old_1}${COLOR_RESET}"
         [[ -n "$ghost" ]] && \
-            PS1+="${COLOR_DARK_BLUE}${ghost}${COLOR_RESET}"
+            PS1+="${COLOR_DIM_BLUE}${ghost}${COLOR_RESET}"
     else
         signal_name=$(_status_signal_name "${last_status}") || signal_name=""
         # [[ -n "$old_0" ]] && \
@@ -133,9 +115,9 @@ _update_ps1_hook() {
         [[ -n "$real" ]] && \
             PS1+="${COLOR_YELLOW}${real}${COLOR_RESET}"
         # [[ -n "$old_1" ]] && \
-        #     PS1+="${COLOR_DARK_RED}${old_1}${COLOR_RESET}"
+        #     PS1+="${COLOR_DIM_RED}${old_1}${COLOR_RESET}"
         [[ -n "$ghost" ]] && \
-            PS1+="${COLOR_DARK_YELLOW}${ghost}${COLOR_RESET}"
+            PS1+="${COLOR_DIM_YELLOW}${ghost}${COLOR_RESET}"
         [[ -n "$signal_name" ]] && \
             PS1+=" ${COLOR_RED}${signal_name}${COLOR_RESET}"
         PS1+=" ${COLOR_RED}(${last_status})${COLOR_RESET}"
