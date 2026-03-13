@@ -346,6 +346,78 @@ __d_or_err__() {
     _loop
 }
 
+__d_normalize_dir__() {
+    local path=${1:-/}
+
+    if [ -z "$path" ]; then
+        path="/"
+    elif [ "$path" != "/" ]; then
+        path=${path%/}
+        [ -n "$path" ] || path="/"
+    fi
+
+    printf '%s\n' "$path"
+}
+
+__d_next_virtual_child__() {
+    local pwd_dir
+    local ghost_dir
+    local suffix
+    local child
+
+    pwd_dir=$(__d_normalize_dir__ "${PWD:-/}")
+    ghost_dir=$(__d_normalize_dir__ "${GHOST_VIRTUAL_PATH:-$pwd_dir}")
+
+    if [ "$pwd_dir" = "/" ]; then
+        case "$ghost_dir" in
+            /) return 1 ;;
+            /*) suffix=${ghost_dir#/} ;;
+            *) return 1 ;;
+        esac
+    else
+        case "$ghost_dir" in
+            "$pwd_dir") return 1 ;;
+            "$pwd_dir"/*) suffix=${ghost_dir#"$pwd_dir"/} ;;
+            *) return 1 ;;
+        esac
+    fi
+
+    child=${suffix%%/*}
+    [ -n "$child" ] || return 1
+
+    if [ "$pwd_dir" = "/" ]; then
+        printf '/%s\n' "$child"
+    else
+        printf '%s/%s\n' "$pwd_dir" "$child"
+    fi
+}
+
+__d_cd_parent__() {
+    [[ "${PWD:-/}" = "/" ]] && return 0
+    builtin cd .. || return $?
+}
+
+__d_cd_child__() {
+    local target_dir
+
+    target_dir=$(__d_next_virtual_child__) || return 0
+    builtin cd "$target_dir" || return $?
+}
+
+__d_set_readline_command__() {
+    READLINE_LINE=$1
+    READLINE_POINT=${#READLINE_LINE}
+    READLINE_MARK=$READLINE_POINT
+}
+
+__d_prepare_parent_command__() {
+    __d_set_readline_command__ "__d_cd_parent__"
+}
+
+__d_prepare_child_command__() {
+    __d_set_readline_command__ "__d_cd_child__"
+}
+
 __d_widget__() {
     local clear_line=$(tput el) # Clear line from cursor to end
     local navigator ret retcode selected error
@@ -387,8 +459,18 @@ if (( BASH_VERSINFO[0] < 4 )); then
     # TODO: Compatible with lower 'bash' version
     false
 else
-    bind -m emacs-standard -x '"\ep": __d_widget__'
-    bind -m vi-command -x '"\ep": __d_widget__'
-    bind -m vi-insert -x '"\ep": __d_widget__'
+    # Replace the current logical readline buffer first, then accept the line.
+    bind -m emacs-standard -x '"\C-x\C-p": __d_prepare_parent_command__'
+    bind -m vi-insert -x '"\C-x\C-p": __d_prepare_parent_command__'
+    bind -m vi-command -x '"\C-x\C-p": __d_prepare_parent_command__'
+    bind -m emacs-standard -x '"\C-x\C-n": __d_prepare_child_command__'
+    bind -m vi-insert -x '"\C-x\C-n": __d_prepare_child_command__'
+    bind -m vi-command -x '"\C-x\C-n": __d_prepare_child_command__'
+    bind -m emacs-standard '"\ep":"\C-x\C-p\C-m"'
+    bind -m vi-insert '"\ep":"\C-x\C-p\C-m"'
+    bind -m vi-command '"\ep":"\C-x\C-p\C-m"'
+    bind -m emacs-standard '"\en":"\C-x\C-n\C-m"'
+    bind -m vi-insert '"\en":"\C-x\C-n\C-m"'
+    bind -m vi-command '"\en":"\C-x\C-n\C-m"'
     :
 fi
