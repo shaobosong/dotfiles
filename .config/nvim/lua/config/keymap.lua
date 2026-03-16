@@ -21,6 +21,11 @@ vim.keymap.set('x', 'gs', ':s@@@g<C-F>hhi', opts)
 
 vim.keymap.set('', '<leader>tr', ':%s/\\s\\+$//g<CR>', opts)
 
+-- Windows
+if vim.fn.has('win32') == 1 then
+    vim.keymap.set('i', '<C-S-V>', '<C-R>+', opts)
+end
+
 -- menu
 -- vim.cmd('anoremenu ToolBar.Go\\ to\\ definition    <Cmd>lua vim.lsp.buf.definition()<CR>')
 -- vim.cmd('anoremenu ToolBar.-1-                     <Nop>')

@@ -17,6 +17,9 @@ end
 
 vim.g.neovide_title_text_color = "white"
 
+-- Enable mouse movement events for popup menu hover effects
+vim.o.mousemoveevent = true
+
 -- keymap
 -- copy into system-clipboard in neovide on windows 11
 local opts = { noremap = true, silent = true }
@@ -25,4 +28,9 @@ vim.keymap.set('x', '<C-S-C>', '"+y', opts)
 -- paste from system-clipboard in neovide on windows 11
 vim.keymap.set('n', '<C-S-V>', '"+p', opts)
 vim.keymap.set('x', '<C-S-V>', '"+P', opts)
-vim.keymap.set('!', '<C-S-V>', '<C-R>+', opts)
+-- vim.keymap.set('!', '<C-S-V>', '<C-R>+', opts) -- neovim
+vim.keymap.set('!', '<C-S-V>', '<C-\\><C-O>"+gP', opts)
+vim.keymap.set('t', '<C-S-V>', '<C-\\><C-N>"+pi', opts)
+
+vim.keymap.set("c", "<M-j>", "<C-n>", opts)
+vim.keymap.set("c", "<M-k>", "<C-p>", opts)
