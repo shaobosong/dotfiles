@@ -411,11 +411,11 @@ __d_set_readline_command__() {
 }
 
 __d_prepare_parent_command__() {
-    __d_set_readline_command__ "__d_cd_parent__"
+    __d_set_readline_command__ " __d_cd_parent__"
 }
 
 __d_prepare_child_command__() {
-    __d_set_readline_command__ "__d_cd_child__"
+    __d_set_readline_command__ " __d_cd_child__"
 }
 
 __d_widget__() {
