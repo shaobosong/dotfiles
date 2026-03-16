@@ -73,6 +73,8 @@ set path+=**
 set list listchars=tab:>·,trail:█,extends:>,precedes:<
 set mouse=a
 set mousemodel=popup
+set laststatus=2
+set statusline=%<%{expand('%:~:.')}%h%m%r%=%l/%L
 
 aunmenu PopUp
 anoremenu PopUp.Copy "+yiw
@@ -92,3 +94,56 @@ noremap! <silent> <ESC>L <ESC><C-W>l
 noremap! <silent> <ESC>H <ESC><C-W>h
 noremap! <silent> <ESC>J <ESC><C-W>j
 noremap! <silent> <ESC>K <ESC><C-W>k
+
+set t_Co=256
+
+augroup CustomHighlights
+    autocmd!
+    autocmd ColorScheme * highlight Cursor       ctermbg=231 ctermfg=233 cterm=NONE
+    autocmd ColorScheme * highlight Normal       ctermbg=NONE ctermfg=231 cterm=NONE
+    autocmd ColorScheme * highlight NormalNC     ctermbg=NONE ctermfg=231 cterm=NONE
+    autocmd ColorScheme * highlight StatusLine   ctermbg=NONE ctermfg=189 cterm=NONE
+    autocmd ColorScheme * highlight StatusLineNC ctermbg=NONE ctermfg=189 cterm=NONE
+    autocmd ColorScheme * highlight MsgArea      ctermbg=NONE ctermfg=189 cterm=NONE
+    autocmd ColorScheme * highlight ModeMsg      ctermbg=NONE ctermfg=189 cterm=NONE
+    autocmd ColorScheme * highlight Visual       ctermbg=239 ctermfg=NONE cterm=NONE
+    autocmd ColorScheme * highlight MatchParen   ctermbg=59  ctermfg=215 cterm=NONE
+    autocmd ColorScheme * highlight Identifier   ctermbg=NONE ctermfg=208 cterm=NONE
+    autocmd ColorScheme * highlight SignColumn   ctermbg=NONE ctermfg=NONE cterm=NONE
+    autocmd ColorScheme * highlight Pmenu        ctermbg=236 ctermfg=244 cterm=NONE
+    autocmd ColorScheme * highlight PmenuSel     ctermbg=242 ctermfg=231 cterm=NONE
+    autocmd ColorScheme * highlight NormalFloat  ctermbg=236 ctermfg=189 cterm=NONE
+    autocmd ColorScheme * highlight FloatBorder  ctermbg=NONE ctermfg=242 cterm=NONE
+    autocmd ColorScheme * highlight ColorColumn  ctermbg=197 ctermfg=NONE cterm=NONE
+    autocmd ColorScheme * highlight DiffAdd      ctermbg=22  ctermfg=NONE cterm=NONE
+    autocmd ColorScheme * highlight DiffChange   ctermbg=17  ctermfg=NONE cterm=NONE
+    autocmd ColorScheme * highlight DiffDelete   ctermbg=52  ctermfg=NONE cterm=NONE
+    autocmd ColorScheme * highlight WinSeparator ctermbg=NONE ctermfg=241 cterm=NONE
+    autocmd ColorScheme * highlight CursorLineNr ctermbg=NONE ctermfg=215 cterm=NONE
+    autocmd ColorScheme * highlight LineNr       ctermbg=NONE ctermfg=241 cterm=NONE
+    autocmd ColorScheme * highlight LineNrAbove  ctermbg=NONE ctermfg=241 cterm=NONE
+    autocmd ColorScheme * highlight LineNrBelow  ctermbg=NONE ctermfg=241 cterm=NONE
+    autocmd ColorScheme * highlight Constant     ctermbg=NONE ctermfg=197 cterm=NONE
+    autocmd ColorScheme * highlight String       ctermbg=NONE ctermfg=144 cterm=NONE
+    autocmd ColorScheme * highlight Special      ctermbg=NONE ctermfg=177 cterm=NONE
+    autocmd ColorScheme * highlight Comment      ctermbg=NONE ctermfg=241 cterm=NONE
+    autocmd ColorScheme * highlight Whitespace   ctermbg=NONE ctermfg=241 cterm=NONE
+    autocmd ColorScheme * highlight PreProc      ctermbg=NONE ctermfg=162 cterm=NONE
+    autocmd ColorScheme * highlight PreCondit    ctermbg=NONE ctermfg=208 cterm=NONE
+    autocmd ColorScheme * highlight Type         ctermbg=NONE ctermfg=34  cterm=NONE
+    autocmd ColorScheme * highlight Operator     ctermbg=NONE ctermfg=34  cterm=NONE
+    autocmd ColorScheme * highlight Statement    ctermbg=NONE ctermfg=220 cterm=NONE
+    autocmd ColorScheme * highlight Function     ctermbg=NONE ctermfg=111 cterm=NONE
+    autocmd ColorScheme * highlight Pmenu          ctermfg=245 ctermbg=236
+    autocmd ColorScheme * highlight PmenuSel       ctermfg=231 ctermbg=241
+    autocmd ColorScheme * highlight PmenuMatch     ctermfg=81  ctermbg=235
+    autocmd ColorScheme * highlight PmenuMatchSel  ctermfg=81  ctermbg=60
+    autocmd ColorScheme * highlight link PmenuKind      Pmenu
+    autocmd ColorScheme * highlight link PmenuKindSel   PmenuSel
+    autocmd ColorScheme * highlight link PmenuExtra     Pmenu
+    autocmd ColorScheme * highlight link PmenuExtraSel  PmenuSel
+    autocmd ColorScheme * highlight PmenuSbar      ctermbg=235
+    autocmd ColorScheme * highlight PmenuThumb     ctermbg=238
+augroup END
+
+colorscheme desert
