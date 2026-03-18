@@ -105,11 +105,11 @@ _update_ps1_hook() {
         # [[ -n "$old_0" ]] && \
         #     PS1+="${COLOR_GREEN}${old_0}${COLOR_RESET}"
         [[ -n "$real" ]] && \
-            PS1+="${COLOR_BLUE}${real}${COLOR_RESET}"
+            PS1+="${COLOR_GREEN}${real}${COLOR_RESET}"
         # [[ -n "$old_1" ]] && \
         #     PS1+="${COLOR_DIM_GREEN}${old_1}${COLOR_RESET}"
         [[ -n "$ghost" ]] && \
-            PS1+="${COLOR_DIM_BLUE}${ghost}${COLOR_RESET}"
+            PS1+="${COLOR_DIM_GREEN}${ghost}${COLOR_RESET}"
     else
         signal_name=$(_status_signal_name "${last_status}") || signal_name=""
         # [[ -n "$old_0" ]] && \
