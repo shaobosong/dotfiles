@@ -50,6 +50,11 @@ resolve_pane_id() {
     [[ -n "${pane_id}" ]]
 }
 
+enter_copy_mode() {
+    tmux select-pane -t "${pane_id}" || return 1
+    tmux copy-mode -t "${pane_id}" || return 1
+}
+
 init_fzf_backend() {
     if command -v fzf-tmux >/dev/null 2>&1; then
         fzf_bin_base=(fzf-tmux -p)
@@ -160,6 +165,11 @@ pick_line() {
     done
 }
 
+exit_copy_mode() {
+    tmux send-keys -t "${pane_id}" -X cancel
+    return 1
+}
+
 parse_selected_line_num() {
     local line_num="${selected_line%%:*}"
 
@@ -174,8 +184,6 @@ parse_selected_line_num() {
 jump_to_line() {
     local line_num="${1}"
 
-    tmux select-pane -t "${pane_id}" || return 1
-    tmux copy-mode -t "${pane_id}" || return 1
     tmux send-keys -t "${pane_id}" -X history-top || return 1
     tmux send-keys -t "${pane_id}" -X top-line || return 1
 
@@ -190,9 +198,10 @@ main() {
     command -v tmux >/dev/null 2>&1 || return 0
     load_tmux_pane_search_lib || return 1
     resolve_pane_id "${1:-}" || return 0
+    enter_copy_mode || return 1
     init_fzf_backend || return 0
     init_picker_state
-    pick_line || return 0
+    pick_line || exit_copy_mode || return 0
 
     line_num="$(parse_selected_line_num)" || return 1
     jump_to_line "${line_num}"
