@@ -190,6 +190,8 @@ jump_to_line() {
     if (( line_num > 1 )); then
         tmux send-keys -N "$((line_num - 1))" -t "${pane_id}" -X cursor-down || return 1
     fi
+
+    tmux send-keys -t "${pane_id}" -X scroll-middle || return 1
 }
 
 main() {
