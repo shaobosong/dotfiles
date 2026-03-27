@@ -238,7 +238,7 @@ local vcs = {
   {
     -- dir = '/root/freedom/gitsigns.nvim',
     "lewis6991/gitsigns.nvim",
-    tag = "v2.0.0",
+    tag = "v2.1.0",
     config = function()
       require("gitsigns").setup({
         signs                   = {
