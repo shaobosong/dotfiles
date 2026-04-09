@@ -100,6 +100,14 @@ _update_ps1_hook() {
     ghost="${GHOST_VIRTUAL_PATH#$PWD}"
 
     PS1="\n"
+    case "$(uname -o)" in
+        *Msys*)
+            PS1+="${COLOR_MAGENTA}${MSYSTEM}${COLOR_RESET} "
+            ;;
+        *Linux*)
+            PS1+="${COLOR_MAGENTA}${MYLINUX:-Linux}${COLOR_RESET} "
+            ;;
+    esac
     # PS1+="${COLOR_PREFIX}${prefix}${COLOR_RESET}"
     if test ${last_status} -eq 0; then
         # [[ -n "$old_0" ]] && \
