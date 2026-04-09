@@ -124,6 +124,7 @@ fi
 alias cls='printf "\033[2J\033[3J\033[1;1H"'
 alias 2hex='printf %x\\n'
 alias 2dec='printf %d\\n'
+alias 2bin='perl -le '\''printf "%b\n", shift'\'''
 
 alias lg='\lazygit'
 alias curls5='\curl -x socks5h://$(\awk '\''$2 == "00000000" {print strtonum("0x" substr($3,7,2)) "." strtonum("0x" substr($3,5,2)) "." strtonum("0x" substr($3,3,2)) "." strtonum("0x" substr($3,1,2))}'\'' /proc/net/route):2208'
@@ -134,8 +135,9 @@ export XDG_CONFIG_HOME=$HOME/.config
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
 export XDG_STATE_HOME=$HOME/.local/state
+export VISUAL=nvim
 export EDITOR=/usr/bin/nano
-export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first,alt-enter:accept --color=dark"
+export FZF_DEFAULT_OPTS="--bind=tab:down,btab:up,alt-j:down,alt-k:up,alt-l:abort,ctrl-alt-h:backward-kill-word,change:first,enter:accept-non-empty --color=dark"
 export DELTA_FEATURES='+side-by-side'
 export RIPGREP_CONFIG_PATH=${_dotfiles_root}/.config/ripgrep/config
 export CARGO_HOME=$HOME/.cargo
