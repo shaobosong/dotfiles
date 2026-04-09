@@ -15,6 +15,89 @@
 #   - D_KEYMAP: Set to "vim" (default) or "emacs" to change key bindings.
 #
 
+__d_fzf_defaults() {
+  printf '%s\n' "--height ${FZF_TMUX_HEIGHT:-25%} --min-height 10+ --bind=ctrl-z:ignore $1"
+  command cat "${FZF_DEFAULT_OPTS_FILE-}" 2> /dev/null
+  printf '%s\n' "${FZF_DEFAULT_OPTS-} $2"
+}
+
+__d_fzf_cmd() {
+  [[ -n ${TMUX_PANE-} ]] && { [[ ${FZF_TMUX:-0} != 0 ]] || [[ -n ${FZF_TMUX_OPTS-} ]]; } &&
+    echo "fzf-tmux ${FZF_TMUX_OPTS:--d${FZF_TMUX_HEIGHT:-40%}} -- " || echo "fzf"
+}
+
+__d_fzf_tab_complete__() {
+    local q="${1-}"
+    local pattern dir base lcp m
+    local -a matches
+    local _was_dotglob=0 _was_nullglob=0
+
+    pattern="${q}"
+
+    shopt -q dotglob && _was_dotglob=1
+    shopt -q nullglob && _was_nullglob=1
+    shopt -s dotglob nullglob
+
+    while true; do
+        matches=()
+
+        if [[ "$pattern" == */* ]]; then
+            dir="${pattern%/*}/"
+            base="${pattern##*/}"
+        else
+            dir=""
+            base="$pattern"
+        fi
+
+        for m in "${dir}${base}"*/; do
+            [[ -d "$m" ]] || continue
+            m="${m%/}"
+            case "${m##*/}" in
+                .git|node_modules) continue ;;
+            esac
+            matches+=("$m")
+        done
+
+        (( ${#matches[@]} )) || break
+
+        lcp="${matches[0]}"
+        for m in "${matches[@]:1}"; do
+            while [[ "$m" != "$lcp"* ]]; do
+                lcp="${lcp%?}"
+            done
+        done
+
+        if [[ "$lcp" == "$pattern" ]]; then
+            (( ${#matches[@]} == 1 )) && pattern="${pattern}/"
+            break
+        fi
+
+        pattern="$lcp"
+
+        if (( ${#matches[@]} == 1 )); then
+            pattern="${pattern}/"
+        fi
+
+        break
+    done
+
+    (( _was_dotglob )) || shopt -u dotglob
+    (( _was_nullglob )) || shopt -u nullglob
+
+    printf '%s' "$pattern"
+}
+export -f __d_fzf_tab_complete__
+
+__d_fzf_cd__() {
+  local dir
+  dir=$(
+    fd --type d --hidden --follow --no-ignore |
+    FZF_DEFAULT_OPTS=$(__d_fzf_defaults "--reverse --scheme=path --exit-0" \
+      "+m --bind 'tab:transform-query:__d_fzf_tab_complete__ {q}'") \
+      FZF_DEFAULT_OPTS_FILE='' $(__d_fzf_cmd)
+  ) && printf 'cd %q' "$(builtin unset CDPATH && builtin cd -- "$dir" && builtin pwd)"
+}
+
 __d_term_cols__() {
     local cols
 
@@ -327,8 +410,8 @@ __d_or_err__() {
                 case "$key" in
                     'h' | 'k' | 'b' | $'\x1b[D') _move_left ;;        # h, b, k, Left Arrow
                     'l' | 'j' | 'w' | 'e' | $'\x1b[C') _move_right ;; # l, w, j, e, Right Arrow
-                    'H' | '^' | $'\x1b[H' | $'\x1b[1') _move_start ;; # H, ^, Home
-                    'L' | '$' | $'\x1b[F' | $'\x1b[4') _move_end ;;   # L, $, End
+                    'H' | 'K' | 'B' | '^' | $'\x1b[H' | $'\x1b[1') _move_start ;; # H, ^, Home
+                    'L' | 'J' | 'W' | '$' | $'\x1b[F' | $'\x1b[4') _move_end ;;   # L, $, End
                     'M') _move_middle ;;
                     ';') _move_last ;; # ;
                     [0-9]) _move_count "$key" ;;
@@ -392,16 +475,16 @@ __d_next_virtual_child__() {
     fi
 }
 
-__d_cd_parent__() {
+d_cd_parent() {
     [[ "${PWD:-/}" = "/" ]] && return 0
     builtin cd .. || return $?
 }
 
-__d_cd_child__() {
+d_cd_child() {
     local target_dir
 
     target_dir=$(__d_next_virtual_child__) || return 0
-    builtin cd "$target_dir" || return $?
+    builtin cd -- "$target_dir" || return $?
 }
 
 __d_set_readline_command__() {
@@ -411,11 +494,11 @@ __d_set_readline_command__() {
 }
 
 __d_prepare_parent_command__() {
-    __d_set_readline_command__ " __d_cd_parent__"
+    __d_set_readline_command__ " d_cd_parent"
 }
 
 __d_prepare_child_command__() {
-    __d_set_readline_command__ " __d_cd_child__"
+    __d_set_readline_command__ " d_cd_child"
 }
 
 __d_widget__() {
@@ -455,6 +538,8 @@ gd() {
     return "$retcode"
 }
 
+bind -m emacs-standard '"\C-\e(": redraw-current-line'
+
 if (( BASH_VERSINFO[0] < 4 )); then
     # TODO: Compatible with lower 'bash' version
     false
@@ -472,5 +557,6 @@ else
     bind -m emacs-standard '"\en":"\C-x\C-n\C-m"'
     bind -m vi-insert '"\en":"\C-x\C-n\C-m"'
     bind -m vi-command '"\en":"\C-x\C-n\C-m"'
+    bind -m emacs-standard '"\eN": " \C-b\C-k \C-u`__d_fzf_cd__`\e\C-e\C-\e(\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d\C-y\ey\C-_"'
     :
 fi
