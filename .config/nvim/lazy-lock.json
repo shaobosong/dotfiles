@@ -23,6 +23,6 @@
   "oil.nvim": { "branch": "master", "commit": "08c2bce8b00fd780fb7999dbffdf7cd174e896fb" },
   "tokyonight.nvim": { "branch": "main", "commit": "057ef5d260c1931f1dffd0f052c685dcd14100a3" },
   "vim-copy": { "branch": "main", "commit": "23789211c31b4279903ba8196968012ed5c51d3e" },
-  "vim-line-comment": { "branch": "main", "commit": "ee3249096fb585dbb4486158fb0f828711d629b6" },
+  "vim-line-comment": { "branch": "main", "commit": "4488bd0f2052d892bfb9732598048ec39fd11cf7" },
   "vimade": { "branch": "master", "commit": "f63ca5cb9cf811b2c526694e820b87fe2238deb6" }
 }
