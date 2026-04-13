@@ -475,30 +475,13 @@ __d_next_virtual_child__() {
     fi
 }
 
-d_cd_parent() {
-    [[ "${PWD:-/}" = "/" ]] && return 0
-    builtin cd .. || return $?
+__d_cd_parent__() {
+    printf 'cd %q' "$(builtin unset CDPATH && builtin cd .. && builtin pwd)"
 }
 
-d_cd_child() {
-    local target_dir
-
-    target_dir=$(__d_next_virtual_child__) || return 0
-    builtin cd -- "$target_dir" || return $?
-}
-
-__d_set_readline_command__() {
-    READLINE_LINE=$1
-    READLINE_POINT=${#READLINE_LINE}
-    READLINE_MARK=$READLINE_POINT
-}
-
-__d_prepare_parent_command__() {
-    __d_set_readline_command__ " d_cd_parent"
-}
-
-__d_prepare_child_command__() {
-    __d_set_readline_command__ " d_cd_child"
+__d_cd_child__() {
+    local dir
+    dir=$(__d_next_virtual_child__) && printf 'cd %q' "$(builtin unset CDPATH && builtin cd -- "$dir" && builtin pwd)"
 }
 
 __d_widget__() {
@@ -544,19 +527,8 @@ if (( BASH_VERSINFO[0] < 4 )); then
     # TODO: Compatible with lower 'bash' version
     false
 else
-    # Replace the current logical readline buffer first, then accept the line.
-    bind -m emacs-standard -x '"\C-x\C-p": __d_prepare_parent_command__'
-    bind -m vi-insert -x '"\C-x\C-p": __d_prepare_parent_command__'
-    bind -m vi-command -x '"\C-x\C-p": __d_prepare_parent_command__'
-    bind -m emacs-standard -x '"\C-x\C-n": __d_prepare_child_command__'
-    bind -m vi-insert -x '"\C-x\C-n": __d_prepare_child_command__'
-    bind -m vi-command -x '"\C-x\C-n": __d_prepare_child_command__'
-    bind -m emacs-standard '"\ep":"\C-x\C-p\C-m"'
-    bind -m vi-insert '"\ep":"\C-x\C-p\C-m"'
-    bind -m vi-command '"\ep":"\C-x\C-p\C-m"'
-    bind -m emacs-standard '"\en":"\C-x\C-n\C-m"'
-    bind -m vi-insert '"\en":"\C-x\C-n\C-m"'
-    bind -m vi-command '"\en":"\C-x\C-n\C-m"'
-    bind -m emacs-standard '"\eN": " \C-b\C-k \C-u`__d_fzf_cd__`\e\C-e\C-\e(\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d\C-y\ey\C-_"'
+    bind -m emacs-standard '"\ep": " \C-b\C-k \C-u `__d_cd_parent__`\e\C-e\C-\e(\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d\C-y\ey\C-_"'
+    bind -m emacs-standard '"\en": " \C-b\C-k \C-u `__d_cd_child__`\e\C-e\C-\e(\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d\C-y\ey\C-_"'
+    bind -m emacs-standard '"\eN": " \C-b\C-k \C-u `__d_fzf_cd__`\e\C-e\C-\e(\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d\C-y\ey\C-_"'
     :
 fi
