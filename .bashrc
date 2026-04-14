@@ -16,6 +16,7 @@ esac
 # A value of 'erasedups' causes all previous lines matching the current
 # line to be removed from the history list before that line is saved.
 HISTCONTROL=ignoreboth:erasedups
+HISTIGNORE='exit:exit *:rm:ls:gd:lg:oc:cx'
 
 # append to the history file, don't overwrite it
 shopt -s histappend
