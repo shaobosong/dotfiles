@@ -34,6 +34,7 @@ set -- \
     ".config/gdb" \
     ".config/git" \
     ".config/nvim" \
+    ".config/opencode" \
     ".config/ripgrep" \
     ".config/tmux" \
     ".config/vim" \
